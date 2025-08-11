@@ -33,6 +33,7 @@ class GpsDataController extends Controller
             'speed' => 'nullable|numeric',
             'course' => 'nullable|numeric',
             'direction' => 'nullable|string',
+            'devices_timestamp' => 'required|date',
         ]);
 
         // Simpan data GPS
@@ -43,6 +44,50 @@ class GpsDataController extends Controller
             'data' => $gpsData
         ], 201);
     }
+
+    // Endpoint bulk - kirim banyak data sekaligus
+    public function storeBulk(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'device_id' => 'required|string',
+                'data' => 'required|array',
+                'data.*.latitude' => 'required|numeric',
+                'data.*.longitude' => 'required|numeric',
+                'data.*.speed' => 'nullable|numeric',
+                'data.*.course' => 'nullable|numeric',
+                'data.*.direction' => 'nullable|string',
+                'data.*.devices_timestamp' => 'required|date',
+            ]);
+
+            $insertData = [];
+            foreach ($validated['data'] as $row) {
+                $insertData[] = [
+                    'device_id' => $validated['device_id'],
+                    'latitude' => $row['latitude'],
+                    'longitude' => $row['longitude'],
+                    'speed' => $row['speed'] ?? null,
+                    'course' => $row['course'] ?? null,
+                    'direction' => $row['direction'] ?? null,
+                    'devices_timestamp' => Carbon::parse($row['devices_timestamp'])->format('Y-m-d H:i:s'),
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+            }
+
+            GpsData::insert($insertData);
+
+            return response()->json([
+                'message' => 'Bulk data stored successfully',
+                'inserted_count' => count($insertData),
+            ], 201);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
 
     /**
      * Display the specified resource.

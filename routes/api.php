@@ -6,11 +6,13 @@ use App\Http\Controllers\Api\GpsDataController;
 
 
 
-Route::prefix('gps-data')->group(function () {
-    Route::get('latest', [GpsDataController::class, 'latestData']);
-    Route::get('filter', [GpsDataController::class, 'filterByDate']);
-    Route::get('device/{deviceId}', [GpsDataController::class, 'byDeviceId']);
+Route::prefix('gps-data')->controller(GpsDataController::class)->group(function () {
+    Route::get('latest', 'latestData');
+    Route::get('filter', 'filterByDate');
+    Route::get('device/{deviceId}', 'byDeviceId');
+    Route::post('bulk', 'storeBulk');
 });
+
 
 Route::apiResource('gps-data', GpsDataController::class)->except([
     'update',

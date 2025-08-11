@@ -19,6 +19,7 @@ return new class extends Migration
             $table->float('speed')->nullable();
             $table->float('course')->nullable();
             $table->string('direction')->nullable();
+            $table->timestamp('devices_timestamp');
             $table->timestamps();
         });
     }

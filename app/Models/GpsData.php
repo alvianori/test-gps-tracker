@@ -14,5 +14,10 @@ class GpsData extends Model
         'speed',
         'course',
         'direction',
+        'devices_timestamp',
+    ];
+
+    protected $casts = [
+        'devices_timestamp' => 'datetime',
     ];
 }
