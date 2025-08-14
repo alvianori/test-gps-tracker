@@ -78,10 +78,6 @@ class ArmadaResource extends Resource
                     ->label('Nomor Mesin')
                     ->maxLength(15),
 
-                Forms\Components\TextInput::make('driver')
-                    ->label('Sopir')
-                    ->maxLength(255),
-
                 Forms\Components\Select::make('status')
                     ->label('Status')
                     ->options([
@@ -131,10 +127,6 @@ class ArmadaResource extends Resource
 
                 Tables\Columns\TextColumn::make('machine_number')
                     ->label('Nomor Mesin'),
-
-                Tables\Columns\TextColumn::make('driver')
-                    ->label('Sopir')
-                    ->sortable(),
 
                 Tables\Columns\BadgeColumn::make('status')
                     ->label('Status')

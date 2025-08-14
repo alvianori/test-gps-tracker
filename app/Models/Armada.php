@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Armada extends Model
 {
     protected $fillable = [
-        'category_armada_id','customer_id', 'name_car', 'plate_number', 'color', 'year', 'frame_number','machine_number','driver', 'status', 'keterangan'
+        'category_armada_id','customer_id', 'name_car', 'plate_number', 'color', 'year', 'frame_number','machine_number', 'status', 'keterangan'
     ];
 
     public function categoryArmada()

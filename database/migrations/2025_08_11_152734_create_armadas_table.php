@@ -21,7 +21,6 @@ return new class extends Migration
             $table->integer('year')->nullable();
             $table->string('frame_number')->unique();
             $table->string('machine_number')->unique();
-            $table->string('driver')->nullable();
             $table->enum('status', ['aktif', 'nonaktif', 'maintenance'])->default('aktif');
             $table->text('keterangan')->nullable();
             $table->timestamps();
