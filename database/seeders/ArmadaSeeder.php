@@ -23,7 +23,6 @@ class ArmadaSeeder extends Seeder
                 'year' => '2020',
                 'frame_number' => 'FR1234567890',
                 'machine_number' => 'MC1234567890',
-                'driver' => 'Budi Santoso',
                 'status' => 'Aktif',
                 'keterangan' => 'Siap digunakan'
             ],
@@ -36,7 +35,6 @@ class ArmadaSeeder extends Seeder
                 'year' => '2022',
                 'frame_number' => 'FR0987654321',
                 'machine_number' => 'MC0987654321',
-                'driver' => 'Slamet Riyadi',
                 'status' => 'Aktif',
                 'keterangan' => 'Baru service'
             ],
