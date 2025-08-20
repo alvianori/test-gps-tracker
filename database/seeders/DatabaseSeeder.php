@@ -25,6 +25,7 @@ class DatabaseSeeder extends Seeder
             CategoryArmadaSeeder::class,
             CustomerSeeder::class,
             ArmadaSeeder::class,
+            UserSeeder::class,
         ]);
     }
 }
