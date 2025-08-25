@@ -6,6 +6,8 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use App\Models\Company;
+use App\Models\Sale;
 
 class UserSeeder extends Seeder
 {
@@ -14,28 +16,48 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        // Superadmin
+        // --- Superadmin ---
         $superadmin = User::create([
             'name' => 'superadmin',
+            'username' => 'superadmin',
             'email' => 'superadmin@gmail.com',
             'password' => Hash::make('password123'),
         ]);
         $superadmin->assignRole('superadmin');
 
-        // Company
-        $company = User::create([
-            'name' => 'company',
+        // --- Company & User Admin ---
+        $company = Company::create([
+            'name' => 'PT Contoh Jaya',
             'email' => 'company@gmail.com',
-            'password' => Hash::make('password123'),
+            'telepon' => '08123456789',
+            'address' => 'Jl. Raya No. 123',
         ]);
-        $company->assignRole('company');
 
-        // Sales
-        $sales = User::create([
-            'name' => 'sales',
-            'email' => 'sales@gmail.com',
+        $companyUser = User::create([
+            'name' => 'Company Admin',
+            'username' => 'company1',
+            'email' => 'company1@gmail.com',
             'password' => Hash::make('password123'),
+            'company_id' => $company->id,
         ]);
-        $sales->assignRole('sales');
+        $companyUser->assignRole('company');
+
+        // --- Sales & User Sales ---
+        $sales = Sale::create([
+            'company_id' => $company->id,
+            'sales_name' => 'Sales Satu',
+            'role' => 'sales',
+            'telepon' => '081298765432',
+            'status' => 'aktif',
+        ]);
+
+        $salesUser = User::create([
+            'name' => 'Sales User',
+            'username' => 'sales1',
+            'email' => 'sales1@gmail.com',
+            'password' => Hash::make('password123'),
+            'sales_id' => $sales->id,
+        ]);
+        $salesUser->assignRole('sales');
     }
 }
