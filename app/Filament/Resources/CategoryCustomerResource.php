@@ -34,13 +34,24 @@ class CategoryCustomerResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name_category_customer')
-                    ->label('Nama Kategori')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\Textarea::make('description')
-                    ->label('Deskripsi')
-                    ->rows(3),
+                Forms\Components\Section::make('Informasi Kategori')
+                    ->description('Isi detail kategori customer dengan jelas.')
+                    ->schema([
+                        Forms\Components\TextInput::make('name_category_customer')
+                            ->label('Nama Kategori')
+                            ->required()
+                            ->placeholder('Contoh: VIP, Premium, Regular')
+                            ->prefixIcon('heroicon-o-tag')
+                            ->helperText('Nama kategori unik untuk membedakan jenis customer.')
+                            ->maxLength(255),
+
+                        Forms\Components\Textarea::make('description')
+                            ->label('Deskripsi (Opsional)')
+                            ->rows(3)
+                            ->placeholder('Tuliskan deskripsi singkat mengenai kategori ini...')
+                            ->helperText('Contoh: Kategori VIP untuk pelanggan prioritas.')
+                            ->columnSpanFull(),
+                    ]),
             ]);
     }
 
@@ -50,28 +61,53 @@ class CategoryCustomerResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name_category_customer')
                     ->label('Nama Kategori')
+                    ->badge()
+                    ->color(fn ($state) => match (strtolower($state)) {
+                        'vip' => 'success',
+                        'premium' => 'warning',
+                        'regular' => 'info',
+                        default => 'gray',
+                    })
+                    ->icon('heroicon-o-tag')
+                    ->sortable()
                     ->searchable()
-                    ->sortable(),
+                    ->tooltip(fn ($record) => "Kategori: {$record->name_category_customer}"),
+
                 Tables\Columns\TextColumn::make('description')
                     ->label('Deskripsi')
-                    ->limit(50),
+                    ->limit(50)
+                    ->wrap()
+                    ->tooltip(fn ($record) => $record->description ?? '-'),
+
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label('Dibuat')
-                    ->dateTime()
-                    ->sortable(),
+                    ->label('Dibuat Pada')
+                    ->dateTime('d M Y, H:i')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                // bisa ditambah filter kategori kalau perlu
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->label('Edit')
+                    ->icon('heroicon-o-pencil-square')
+                    ->color('warning'),
+
+                Tables\Actions\DeleteAction::make()
+                    ->label('Hapus')
+                    ->icon('heroicon-o-trash')
+                    ->color('danger'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->striped()
+            ->defaultSort('created_at', 'desc')
+            ->paginated([10, 25, 50])
+            ->persistFiltersInSession();
     }
 
     public static function getRelations(): array

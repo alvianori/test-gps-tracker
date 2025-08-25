@@ -3,7 +3,6 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\CategoryArmadaResource\Pages;
-use App\Filament\Resources\CategoryArmadaResource\RelationManagers;
 use App\Models\CategoryArmada;
 use App\Filament\Clusters\MasterData;
 use Filament\Forms;
@@ -12,24 +11,25 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\TextArea;
+use Filament\Forms\Components\Textarea;
 use Filament\Tables\Columns\TextColumn;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class CategoryArmadaResource extends Resource
 {
     protected static ?string $model = CategoryArmada::class;
     protected static ?string $cluster = MasterData::class;
+
     public static function getNavigationGroup(): ?string
     {
         return 'Manage Armada';
     }
+
     public static function getNavigationSort(): ?int
     {
         return 1; 
     }
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+
+    protected static ?string $navigationIcon = 'heroicon-o-truck';
     protected static ?string $navigationLabel = 'Kategori Armada';
     protected static ?string $pluralModelLabel = 'Kategori Armada';
     protected static ?string $modelLabel = 'Kategori Armada';
@@ -38,15 +38,30 @@ class CategoryArmadaResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name_category_armada')
-                    ->label('Kategori Armada')
-                    ->required()
-                    ->maxLength(255),
+                Forms\Components\Section::make('Informasi Kategori')
+                    ->description('Isi detail kategori armada dengan lengkap.')
+                    ->icon('heroicon-o-rectangle-stack')
+                    ->collapsible()
+                    ->schema([
+                    TextInput::make('name_category_armada')
+                        ->label('Nama Kategori Armada')
+                        ->placeholder('Contoh: Bus Pariwisata')
+                        ->required()
+                        ->unique(ignoreRecord: true) // validasi biar gak duplikat
+                        ->helperText('Masukkan nama kategori armada yang unik, misalnya "Bus Pariwisata" atau "Mobil Travel".')
+                        ->columnSpanFull()
+                        ->autofocus()
+                        ->maxLength(255),
 
-                Forms\Components\Textarea::make('description')
-                    ->label('Deskripsi')
-                    ->rows(3)
-                    ->maxLength(65535),
+                    Textarea::make('description')
+                        ->label('Deskripsi')
+                        ->placeholder('Tuliskan deskripsi singkat mengenai kategori armada ini...')
+                        ->rows(4)
+                        ->columnSpanFull()
+                        ->autosize()
+                        ->helperText('Opsional, isi untuk memberikan detail tambahan mengenai kategori.'),
+                                        ])
+                    ->columns(2),
             ]);
     }
 
@@ -54,39 +69,51 @@ class CategoryArmadaResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name_category_armada')
+                TextColumn::make('name_category_armada')
                     ->label('Nama Kategori Armada')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->weight('bold')
+                    ->badge()
+                    ->color('primary'),
 
-                Tables\Columns\TextColumn::make('description')
+                TextColumn::make('description')
                     ->label('Deskripsi')
-                    ->limit(50),
+                    ->limit(50)
+                    ->tooltip(fn ($record) => $record->description),
 
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->label('Dibuat')
-                    ->dateTime()
-                    ->sortable(),
+                    ->date('d M Y H:i')
+                    ->sortable()
+                    ->icon('heroicon-o-calendar'), // 👉 kalau error, hapus koma ini
             ])
-            ->filters([
-                //
-            ])
+            ->filters([])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->label('Ubah')
+                    ->icon('heroicon-o-pencil-square')
+                    ->color('warning'),
+
+                Tables\Actions\DeleteAction::make()
+                    ->label('Hapus')
+                    ->icon('heroicon-o-trash')
+                    ->color('danger'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->label('Hapus yang dipilih')
+                        ->icon('heroicon-o-trash'),
                 ]),
-            ]);
+            ])
+            ->striped()
+            ->paginated([10, 25, 50]);
     }
 
     public static function getRelations(): array
     {
-        return [
-            //
-        ];
+        return [];
     }
 
     public static function getPages(): array
