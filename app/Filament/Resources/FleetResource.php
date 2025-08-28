@@ -48,12 +48,6 @@ class FleetResource extends Resource
                             ->required()
                             ->maxLength(50)
                             ->placeholder('Masukkan nomor mesin'),
-                        Forms\Components\Select::make('fleet_category_id')
-                            ->label('Kategori Kendaraan')
-                            ->relationship('category', 'name')
-                            ->required()
-                            ->searchable()
-                            ->preload(),
                         Forms\Components\Select::make('company_id')
                             ->label('Perusahaan')
                             ->relationship('company', 'name')
@@ -61,10 +55,25 @@ class FleetResource extends Resource
                             ->preload()
                             ->required()
                             ->visible(fn() => auth()->user()->hasRole('super_admin'))
-                            ->default(fn() => auth()->user()->hasRole('super_admin') ? null : auth()->user()->company_id),
+                            ->default(fn() => auth()->user()->hasRole('super_admin') ? null : auth()->user()->company_id)
+                            ->afterStateUpdated(function ($state, callable $set) {
+                                $set('fleet_category_id', null);
+                            }),
                         Forms\Components\Hidden::make('company_id')
                             ->default(fn() => auth()->user()->company_id)
                             ->visible(fn() => !auth()->user()->hasRole('super_admin')),
+                        Forms\Components\Select::make('fleet_category_id')
+                            ->label('Kategori Kendaraan')
+                            ->relationship('category', 'name', function (Builder $query, callable $get) {
+                                $companyId = $get('company_id');
+                                if ($companyId) {
+                                    $query->where('company_id', $companyId);
+                                }
+                                return $query;
+                            })
+                            ->required()
+                            ->searchable()
+                            ->preload(),
                     ])
                     ->columns(2),
             ]);

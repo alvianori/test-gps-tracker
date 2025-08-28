@@ -36,7 +36,18 @@ class CompanyResource extends Resource
                             ->required()
                             ->maxLength(255)
                             ->placeholder('Masukkan nama perusahaan')
+                            ->live(onBlur: true)
+                            ->afterStateUpdated(function (string $state, callable $set) {
+                                $set('slug', str()->slug($state));
+                            })
                             ->columnSpan(2),
+                        Forms\Components\TextInput::make('slug')
+                            ->label('Slug')
+                            ->required()
+                            ->maxLength(255)
+                            ->disabled()
+                            ->dehydrated()
+                            ->unique(ignoreRecord: true),
                         Forms\Components\TextInput::make('email')
                             ->label('Email')
                             ->email()
@@ -47,8 +58,9 @@ class CompanyResource extends Resource
                             ->tel()
                             ->required()
                             ->maxLength(20)
-                            ->placeholder('08xxxxxxxxxx')
-                            ->regex('/^[0-9]{10,15}$/')
+                            ->placeholder('8xxxxxxxxxx')
+                            ->prefix('+62')
+                            ->regex('/^[0-9]{9,15}$/')
                             ->validationAttribute('nomor telepon'),
                         Forms\Components\Select::make('business_type_id')
                             ->label('Jenis Bisnis')

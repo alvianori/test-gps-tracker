@@ -18,6 +18,11 @@ class Company extends Model
         'phone',
         'npwp',
     ];
+    
+    public function setPhoneAttribute($value)
+    {
+        $this->attributes['phone'] = '+62' . $value;
+    }
 
     public function users()
     {

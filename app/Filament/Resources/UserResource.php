@@ -69,16 +69,13 @@ class UserResource extends Resource
                             ->searchable()
                             ->preload()
                             ->live()
-                            ->afterStateUpdated(fn (Forms\Components\Select $component) => $component
-                                ->getContainer()
-                                ->getComponent('departmentSelect')
-                                ->getChildComponentContainer()
-                                ->getComponent('department_id')
-                                ->reset()),
+                            ->afterStateUpdated(function ($state, callable $set) {
+                                $set('department_id', null);
+                                $set('position_id', null);
+                            }),
                         Forms\Components\Grid::make(2)
                             ->schema([
                                 Forms\Components\Group::make()
-                                    ->id('departmentSelect')
                                     ->schema([
                                         Forms\Components\Select::make('department_id')
                                             ->label('Departemen')
@@ -92,10 +89,13 @@ class UserResource extends Resource
                                     ]),
                                 Forms\Components\Select::make('position_id')
                                     ->label('Posisi')
-                                    ->relationship('position', 'name')
+                                    ->relationship('position', 'name', function ($get, $query) {
+                                        return $query->where('company_id', $get('company_id'));
+                                    })
                                     ->searchable()
                                     ->preload()
-                                    ->placeholder('Pilih posisi'),
+                                    ->placeholder('Pilih posisi')
+                                    ->disabled(fn ($get) => !$get('company_id')),
                             ]),
                     ]),
             ]);

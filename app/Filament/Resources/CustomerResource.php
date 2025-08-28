@@ -49,12 +49,14 @@ class CustomerResource extends Resource
                             ->tel()
                             ->required()
                             ->maxLength(20)
-                            ->placeholder('08xxxxxxxxxx')
-                            ->regex('/^[0-9]{10,15}$/')
+                            ->prefix('+62')
+                            ->placeholder('8xxxxxxxxxx')
+                            ->regex('/^[0-9]{9,15}$/')
                             ->validationAttribute('nomor telepon'),
                         Forms\Components\Select::make('customer_category_id')
                             ->label('Kategori Pelanggan')
                             ->relationship('category', 'name')
+                            ->getOptionLabelFromRecordUsing(fn ($record) => "{$record->name} - {$record->company->name}")
                             ->required()
                             ->searchable()
                             ->preload(),

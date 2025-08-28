@@ -19,6 +19,11 @@ class Customer extends Model
         'company_id'
     ];
     
+    public function setPhoneAttribute($value)
+    {
+        $this->attributes['phone'] = '+62' . $value;
+    }
+    
     /**
      * The "booted" method of the model.
      *
