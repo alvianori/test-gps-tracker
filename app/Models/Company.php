@@ -48,6 +48,16 @@ class Company extends Model
     {
         return $this->hasMany(Customer::class);
     }
+    
+    public function customerCategories()
+    {
+        return $this->hasMany(CustomerCategory::class);
+    }
+    
+    public function fleetCategories()
+    {
+        return $this->hasMany(FleetCategory::class);
+    }
 
     public function fleets()
     {

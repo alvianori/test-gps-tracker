@@ -2,10 +2,14 @@
 
 namespace App\Models;
 
+use App\Scopes\CompanyScope;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Fleet extends Model
 {
+    use HasFactory;
+    
     protected $fillable = [
         'name',
         'plate_number',
@@ -13,12 +17,21 @@ class Fleet extends Model
         'fleet_category_id',
         'company_id'
     ];
+    
+    /**
+     * The "booted" method of the model.
+     *
+     * @return void
+     */
+    protected static function booted()
+    {
+        static::addGlobalScope(new CompanyScope);
+    }
 
     public function category()
     {
         return $this->belongsTo(FleetCategory::class, 'fleet_category_id');
     }
-
 
     public function company()
     {

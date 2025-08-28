@@ -15,7 +15,9 @@ class DatabaseSeeder extends Seeder
             DepartmentSeeder::class,
             PositionSeeder::class,
             RolePermissionSeeder::class,
+            SalesRoleSeeder::class, // Tambahkan role sales
             UserSeeder::class,
+            SalesUserSeeder::class, // Tambahkan user dengan role sales
             FleetCategorySeeder::class,
             FleetSeeder::class,
             CustomerCategorySeeder::class,

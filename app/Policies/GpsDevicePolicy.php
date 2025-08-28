@@ -3,10 +3,10 @@
 namespace App\Policies;
 
 use App\Models\User;
-use App\Models\FleetCategory;
+use App\Models\GpsDevice;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
-class FleetCategoryPolicy
+class GpsDevicePolicy
 {
     use HandlesAuthorization;
 
@@ -15,23 +15,23 @@ class FleetCategoryPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_fleet::category');
+        return $user->can('view_any_gps::device');
     }
 
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, FleetCategory $fleetCategory): bool
+    public function view(User $user, GpsDevice $gpsDevice): bool
     {
-        // Jika user memiliki permission view_fleet::category
-        if ($user->can('view_fleet::category')) {
+        // Jika user memiliki permission view_gps::device
+        if ($user->can('view_gps::device')) {
             // Super admin dapat melihat semua data
             if ($user->hasRole('super_admin')) {
                 return true;
             }
             
             // User lain hanya dapat melihat data dari company mereka sendiri
-            return $user->company_id === $fleetCategory->company_id;
+            return $user->company_id === $gpsDevice->company_id;
         }
         
         return false;
@@ -42,23 +42,23 @@ class FleetCategoryPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_fleet::category');
+        return $user->can('create_gps::device');
     }
 
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, FleetCategory $fleetCategory): bool
+    public function update(User $user, GpsDevice $gpsDevice): bool
     {
-        // Jika user memiliki permission update_fleet::category
-        if ($user->can('update_fleet::category')) {
+        // Jika user memiliki permission update_gps::device
+        if ($user->can('update_gps::device')) {
             // Super admin dapat mengupdate semua data
             if ($user->hasRole('super_admin')) {
                 return true;
             }
             
             // User lain hanya dapat mengupdate data dari company mereka sendiri
-            return $user->company_id === $fleetCategory->company_id;
+            return $user->company_id === $gpsDevice->company_id;
         }
         
         return false;
@@ -67,17 +67,17 @@ class FleetCategoryPolicy
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, FleetCategory $fleetCategory): bool
+    public function delete(User $user, GpsDevice $gpsDevice): bool
     {
-        // Jika user memiliki permission delete_fleet::category
-        if ($user->can('delete_fleet::category')) {
+        // Jika user memiliki permission delete_gps::device
+        if ($user->can('delete_gps::device')) {
             // Super admin dapat menghapus semua data
             if ($user->hasRole('super_admin')) {
                 return true;
             }
             
             // User lain hanya dapat menghapus data dari company mereka sendiri
-            return $user->company_id === $fleetCategory->company_id;
+            return $user->company_id === $gpsDevice->company_id;
         }
         
         return false;
@@ -88,15 +88,15 @@ class FleetCategoryPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_fleet::category');
+        return $user->can('delete_any_gps::device');
     }
 
     /**
      * Determine whether the user can permanently delete.
      */
-    public function forceDelete(User $user, FleetCategory $fleetCategory): bool
+    public function forceDelete(User $user, GpsDevice $gpsDevice): bool
     {
-        return $user->can('force_delete_fleet::category');
+        return $user->can('{{ ForceDelete }}');
     }
 
     /**
@@ -104,15 +104,15 @@ class FleetCategoryPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_fleet::category');
+        return $user->can('{{ ForceDeleteAny }}');
     }
 
     /**
      * Determine whether the user can restore.
      */
-    public function restore(User $user, FleetCategory $fleetCategory): bool
+    public function restore(User $user, GpsDevice $gpsDevice): bool
     {
-        return $user->can('restore_fleet::category');
+        return $user->can('{{ Restore }}');
     }
 
     /**
@@ -120,15 +120,15 @@ class FleetCategoryPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_fleet::category');
+        return $user->can('{{ RestoreAny }}');
     }
 
     /**
      * Determine whether the user can replicate.
      */
-    public function replicate(User $user, FleetCategory $fleetCategory): bool
+    public function replicate(User $user, GpsDevice $gpsDevice): bool
     {
-        return $user->can('replicate_fleet::category');
+        return $user->can('{{ Replicate }}');
     }
 
     /**
@@ -136,6 +136,6 @@ class FleetCategoryPolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_fleet::category');
+        return $user->can('{{ Reorder }}');
     }
 }

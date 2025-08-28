@@ -2,10 +2,14 @@
 
 namespace App\Models;
 
+use App\Scopes\CompanyScope;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Customer extends Model
 {
+    use HasFactory;
+    
     protected $fillable = [
         'name',
         'email',
@@ -14,6 +18,16 @@ class Customer extends Model
         'customer_category_id',
         'company_id'
     ];
+    
+    /**
+     * The "booted" method of the model.
+     *
+     * @return void
+     */
+    protected static function booted()
+    {
+        static::addGlobalScope(new CompanyScope);
+    }
 
     public function category()
     {

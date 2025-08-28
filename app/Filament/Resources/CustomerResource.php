@@ -17,30 +17,61 @@ class CustomerResource extends Resource
 {
     protected static ?string $model = Customer::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-users';
+    
+    protected static ?string $navigationGroup = 'Pelanggan';
+    
+    protected static ?int $navigationSort = 1;
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('email')
-                    ->email()
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('phone')
-                    ->tel()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('customer_category_id')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('area_id')
-                    ->numeric(),
-                Forms\Components\TextInput::make('company_id')
-                    ->required()
-                    ->numeric(),
+                Forms\Components\Section::make('Informasi Pelanggan')
+                    ->description('Masukkan informasi detail pelanggan')
+                    ->icon('heroicon-o-user')
+                    ->schema([
+                        Forms\Components\TextInput::make('name')
+                            ->label('Nama')
+                            ->required()
+                            ->maxLength(255)
+                            ->placeholder('Masukkan nama pelanggan')
+                            ->columnSpan(2),
+                        Forms\Components\TextInput::make('email')
+                            ->label('Email')
+                            ->email()
+                            ->required()
+                            ->maxLength(255)
+                            ->placeholder('email@example.com')
+                            ->unique(ignoreRecord: true),
+                        Forms\Components\TextInput::make('phone')
+                            ->label('Nomor Telepon')
+                            ->tel()
+                            ->required()
+                            ->maxLength(20)
+                            ->placeholder('08xxxxxxxxxx')
+                            ->regex('/^[0-9]{10,15}$/')
+                            ->validationAttribute('nomor telepon'),
+                        Forms\Components\Select::make('customer_category_id')
+                            ->label('Kategori Pelanggan')
+                            ->relationship('category', 'name')
+                            ->required()
+                            ->searchable()
+                            ->preload(),
+                        Forms\Components\Hidden::make('company_id')
+                            ->default(fn() => auth()->user()->hasRole('super_admin') ? 1 : auth()->user()->company_id),
+                    ])
+                    ->columns(2),
+                Forms\Components\Section::make('Alamat')
+                    ->icon('heroicon-o-map-pin')
+                    ->schema([
+                        Forms\Components\Textarea::make('address')
+                            ->label('Alamat Lengkap')
+                            ->required()
+                            ->rows(3)
+                            ->placeholder('Masukkan alamat lengkap')
+                            ->columnSpanFull(),
+                    ]),
             ]);
     }
 
@@ -49,26 +80,46 @@ class CustomerResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->searchable(),
+                    ->label('Nama')
+                    ->searchable()
+                    ->sortable()
+                    ->weight('bold'),
                 Tables\Columns\TextColumn::make('email')
-                    ->searchable(),
+                    ->label('Email')
+                    ->searchable()
+                    ->sortable()
+                    ->icon('heroicon-o-envelope')
+                    ->copyable(),
                 Tables\Columns\TextColumn::make('phone')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('customer_category_id')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('area_id')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('company_id')
-                    ->numeric()
-                    ->sortable(),
+                    ->label('Telepon')
+                    ->searchable()
+                    ->sortable()
+                    ->icon('heroicon-o-phone')
+                    ->copyable(),
+                Tables\Columns\TextColumn::make('category.name')
+                    ->label('Kategori')
+                    ->sortable()
+                    ->badge()
+                    ->color('success'),
+                Tables\Columns\TextColumn::make('address')
+                    ->label('Alamat')
+                    ->limit(30)
+                    ->tooltip(function (Tables\Columns\TextColumn $column): ?string {
+                        $state = $column->getState();
+                        if (strlen($state) <= 30) {
+                            return null;
+                        }
+                        return $state;
+                    })
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
+                    ->label('Dibuat')
+                    ->dateTime('d M Y')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
+                    ->label('Diperbarui')
+                    ->dateTime('d M Y')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])

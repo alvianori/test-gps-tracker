@@ -2,9 +2,8 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\BusinessTypeResource\Pages;
-use App\Filament\Resources\BusinessTypeResource\RelationManagers;
-use App\Models\BusinessType;
+use App\Filament\Resources\PositionResource\Pages;
+use App\Models\Position;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -13,35 +12,42 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class BusinessTypeResource extends Resource
+class PositionResource extends Resource
 {
-    protected static ?string $model = BusinessType::class;
+    protected static ?string $model = Position::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-building-office';
+    protected static ?string $navigationIcon = 'heroicon-o-briefcase';
     
-    protected static ?string $navigationGroup = 'Master Data';
+    protected static ?string $navigationGroup = 'Pengaturan';
     
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 4;
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('Informasi Jenis Bisnis')
-                    ->description('Masukkan informasi jenis bisnis')
-                    ->icon('heroicon-o-building-office')
+                Forms\Components\Section::make('Informasi Jabatan')
+                    ->description('Masukkan informasi detail jabatan')
+                    ->icon('heroicon-o-briefcase')
                     ->schema([
                         Forms\Components\TextInput::make('name')
-                            ->label('Nama Jenis Bisnis')
+                            ->label('Nama Jabatan')
                             ->required()
                             ->maxLength(255)
-                            ->placeholder('Masukkan nama jenis bisnis')
+                            ->placeholder('Masukkan nama jabatan')
                             ->unique(ignoreRecord: true),
                         Forms\Components\Textarea::make('description')
                             ->label('Deskripsi')
-                            ->placeholder('Masukkan deskripsi jenis bisnis')
-                            ->rows(3)
+                            ->maxLength(1000)
+                            ->placeholder('Masukkan deskripsi jabatan')
                             ->columnSpanFull(),
+                        Forms\Components\Select::make('company_id')
+                            ->label('Perusahaan')
+                            ->relationship('company', 'name')
+                            ->required()
+                            ->searchable()
+                            ->preload()
+                            ->placeholder('Pilih perusahaan'),
                     ]),
             ]);
     }
@@ -51,36 +57,46 @@ class BusinessTypeResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->label('Nama Jenis Bisnis')
+                    ->label('Nama Jabatan')
                     ->searchable()
                     ->sortable()
-                    ->icon('heroicon-o-building-office'),
+                    ->icon('heroicon-o-briefcase')
+                    ->copyable(),
                 Tables\Columns\TextColumn::make('description')
                     ->label('Deskripsi')
                     ->limit(50)
                     ->tooltip(function (Tables\Columns\TextColumn $column): ?string {
                         $state = $column->getState();
+                        
                         if (strlen($state) <= 50) {
                             return null;
                         }
+                        
                         return $state;
                     }),
+                Tables\Columns\TextColumn::make('company.name')
+                    ->label('Perusahaan')
+                    ->searchable()
+                    ->sortable()
+                    ->badge()
+                    ->color('success'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Dibuat Pada')
                     ->dateTime('d M Y, H:i')
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label('Diperbarui Pada')
                     ->dateTime('d M Y, H:i')
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(),
             ])
             ->filters([
                 //
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -88,20 +104,20 @@ class BusinessTypeResource extends Resource
                 ]),
             ]);
     }
-
+    
     public static function getRelations(): array
     {
         return [
             //
         ];
     }
-
+    
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListBusinessTypes::route('/'),
-            'create' => Pages\CreateBusinessType::route('/create'),
-            'edit' => Pages\EditBusinessType::route('/{record}/edit'),
+            'index' => Pages\ListPositions::route('/'),
+            'create' => Pages\CreatePosition::route('/create'),
+            'edit' => Pages\EditPosition::route('/{record}/edit'),
         ];
     }
 }

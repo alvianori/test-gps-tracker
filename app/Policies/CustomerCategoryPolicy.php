@@ -23,7 +23,18 @@ class CustomerCategoryPolicy
      */
     public function view(User $user, CustomerCategory $customerCategory): bool
     {
-        return $user->can('view_customer::category');
+        // Jika user memiliki permission view_customer::category
+        if ($user->can('view_customer::category')) {
+            // Super admin dapat melihat semua data
+            if ($user->hasRole('super_admin')) {
+                return true;
+            }
+            
+            // User lain hanya dapat melihat data dari company mereka sendiri
+            return $user->company_id === $customerCategory->company_id;
+        }
+        
+        return false;
     }
 
     /**
@@ -39,7 +50,18 @@ class CustomerCategoryPolicy
      */
     public function update(User $user, CustomerCategory $customerCategory): bool
     {
-        return $user->can('update_customer::category');
+        // Jika user memiliki permission update_customer::category
+        if ($user->can('update_customer::category')) {
+            // Super admin dapat mengupdate semua data
+            if ($user->hasRole('super_admin')) {
+                return true;
+            }
+            
+            // User lain hanya dapat mengupdate data dari company mereka sendiri
+            return $user->company_id === $customerCategory->company_id;
+        }
+        
+        return false;
     }
 
     /**
@@ -47,7 +69,18 @@ class CustomerCategoryPolicy
      */
     public function delete(User $user, CustomerCategory $customerCategory): bool
     {
-        return $user->can('delete_customer::category');
+        // Jika user memiliki permission delete_customer::category
+        if ($user->can('delete_customer::category')) {
+            // Super admin dapat menghapus semua data
+            if ($user->hasRole('super_admin')) {
+                return true;
+            }
+            
+            // User lain hanya dapat menghapus data dari company mereka sendiri
+            return $user->company_id === $customerCategory->company_id;
+        }
+        
+        return false;
     }
 
     /**

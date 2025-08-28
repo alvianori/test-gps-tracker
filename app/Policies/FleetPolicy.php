@@ -23,7 +23,18 @@ class FleetPolicy
      */
     public function view(User $user, Fleet $fleet): bool
     {
-        return $user->can('view_fleet');
+        // Jika user memiliki permission view_fleet
+        if ($user->can('view_fleet')) {
+            // Super admin dapat melihat semua data
+            if ($user->hasRole('super_admin')) {
+                return true;
+            }
+            
+            // User lain hanya dapat melihat data dari company mereka sendiri
+            return $user->company_id === $fleet->company_id;
+        }
+        
+        return false;
     }
 
     /**
@@ -39,7 +50,18 @@ class FleetPolicy
      */
     public function update(User $user, Fleet $fleet): bool
     {
-        return $user->can('update_fleet');
+        // Jika user memiliki permission update_fleet
+        if ($user->can('update_fleet')) {
+            // Super admin dapat mengupdate semua data
+            if ($user->hasRole('super_admin')) {
+                return true;
+            }
+            
+            // User lain hanya dapat mengupdate data dari company mereka sendiri
+            return $user->company_id === $fleet->company_id;
+        }
+        
+        return false;
     }
 
     /**
@@ -47,7 +69,18 @@ class FleetPolicy
      */
     public function delete(User $user, Fleet $fleet): bool
     {
-        return $user->can('delete_fleet');
+        // Jika user memiliki permission delete_fleet
+        if ($user->can('delete_fleet')) {
+            // Super admin dapat menghapus semua data
+            if ($user->hasRole('super_admin')) {
+                return true;
+            }
+            
+            // User lain hanya dapat menghapus data dari company mereka sendiri
+            return $user->company_id === $fleet->company_id;
+        }
+        
+        return false;
     }
 
     /**

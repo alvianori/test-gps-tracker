@@ -2,9 +2,8 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\FleetResource\Pages;
-use App\Filament\Resources\FleetResource\RelationManagers;
-use App\Models\Fleet;
+use App\Filament\Resources\GpsDeviceResource\Pages;
+use App\Models\GpsDevice;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -13,13 +12,13 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class FleetResource extends Resource
+class GpsDeviceResource extends Resource
 {
-    protected static ?string $model = Fleet::class;
+    protected static ?string $model = GpsDevice::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-truck';
+    protected static ?string $navigationIcon = 'heroicon-o-device-phone-mobile';
     
-    protected static ?string $navigationGroup = 'Kendaraan';
+    protected static ?string $navigationGroup = 'GPS Tracking';
     
     protected static ?int $navigationSort = 1;
 
@@ -27,33 +26,31 @@ class FleetResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('Informasi Kendaraan')
-                    ->description('Masukkan informasi detail kendaraan')
-                    ->icon('heroicon-o-truck')
+                Forms\Components\Section::make('Informasi Perangkat GPS')
+                    ->description('Masukkan informasi detail perangkat GPS')
+                    ->icon('heroicon-o-device-phone-mobile')
                     ->schema([
                         Forms\Components\TextInput::make('name')
-                            ->label('Nama Kendaraan')
+                            ->label('Nama Perangkat')
                             ->required()
                             ->maxLength(255)
-                            ->placeholder('Masukkan nama kendaraan')
-                            ->columnSpan(2),
-                        Forms\Components\TextInput::make('plate_number')
-                            ->label('Nomor Plat')
+                            ->placeholder('Masukkan nama perangkat GPS'),
+                        Forms\Components\TextInput::make('serial_number')
+                            ->label('Nomor Seri')
                             ->required()
-                            ->maxLength(20)
-                            ->placeholder('B 1234 ABC')
+                            ->maxLength(255)
+                            ->placeholder('Masukkan nomor seri perangkat')
                             ->unique(ignoreRecord: true),
-                        Forms\Components\TextInput::make('machine_number')
-                            ->label('Nomor Mesin')
+                        Forms\Components\TextInput::make('model')
+                            ->label('Model')
                             ->required()
-                            ->maxLength(50)
-                            ->placeholder('Masukkan nomor mesin'),
-                        Forms\Components\Select::make('fleet_category_id')
-                            ->label('Kategori Kendaraan')
-                            ->relationship('category', 'name')
+                            ->maxLength(255)
+                            ->placeholder('Masukkan model perangkat'),
+                        Forms\Components\TextInput::make('provider')
+                            ->label('Penyedia')
                             ->required()
-                            ->searchable()
-                            ->preload(),
+                            ->maxLength(255)
+                            ->placeholder('Masukkan nama penyedia perangkat'),
                         Forms\Components\Select::make('company_id')
                             ->label('Perusahaan')
                             ->relationship('company', 'name')
@@ -65,8 +62,7 @@ class FleetResource extends Resource
                         Forms\Components\Hidden::make('company_id')
                             ->default(fn() => auth()->user()->company_id)
                             ->visible(fn() => !auth()->user()->hasRole('super_admin')),
-                    ])
-                    ->columns(2),
+                    ]),
             ]);
     }
 
@@ -75,57 +71,50 @@ class FleetResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->label('Nama Kendaraan')
+                    ->label('Nama Perangkat')
                     ->searchable()
                     ->sortable()
-                    ->weight('bold'),
-                Tables\Columns\TextColumn::make('plate_number')
-                    ->label('Nomor Plat')
+                    ->icon('heroicon-o-device-phone-mobile'),
+                Tables\Columns\TextColumn::make('serial_number')
+                    ->label('Nomor Seri')
                     ->searchable()
                     ->sortable()
-                    ->icon('heroicon-o-identification')
                     ->copyable(),
-                Tables\Columns\TextColumn::make('machine_number')
-                    ->label('Nomor Mesin')
+                Tables\Columns\TextColumn::make('model')
+                    ->label('Model')
                     ->searchable()
-                    ->sortable()
-                    ->icon('heroicon-o-cog')
-                    ->copyable()
-                    ->toggleable(),
-                Tables\Columns\TextColumn::make('category.name')
-                    ->label('Kategori')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('provider')
+                    ->label('Penyedia')
+                    ->searchable()
                     ->sortable()
                     ->badge()
-                    ->color('primary'),
+                    ->color('success'),
                 Tables\Columns\TextColumn::make('company.name')
                     ->label('Perusahaan')
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label('Dibuat')
-                    ->dateTime('d M Y')
+                    ->label('Dibuat Pada')
+                    ->dateTime('d M Y, H:i')
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('updated_at')
-                    ->label('Diperbarui')
-                    ->dateTime('d M Y')
+                    ->label('Diperbarui Pada')
+                    ->dateTime('d M Y, H:i')
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('company_id')
                     ->label('Perusahaan')
                     ->relationship('company', 'name')
                     ->preload()
-                    ->searchable(),
-                Tables\Filters\SelectFilter::make('fleet_category_id')
-                    ->label('Kategori')
-                    ->relationship('category', 'name')
-                    ->preload()
                     ->searchable()
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -133,20 +122,20 @@ class FleetResource extends Resource
                 ]),
             ]);
     }
-
+    
     public static function getRelations(): array
     {
         return [
             //
         ];
     }
-
+    
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListFleets::route('/'),
-            'create' => Pages\CreateFleet::route('/create'),
-            'edit' => Pages\EditFleet::route('/{record}/edit'),
+            'index' => Pages\ListGpsDevices::route('/'),
+            'create' => Pages\CreateGpsDevice::route('/create'),
+            'edit' => Pages\EditGpsDevice::route('/{record}/edit'),
         ];
     }
 }

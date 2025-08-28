@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class GpsTrack extends Model
 {
-    //
+    use HasFactory;
+    
     protected $fillable = [
         'gps_device_id',
         'latitude',
@@ -16,4 +18,9 @@ class GpsTrack extends Model
         'direction',
         'devices_timestamp'
     ];
+    
+    public function gpsDevice()
+    {
+        return $this->belongsTo(GpsDevice::class);
+    }
 }
