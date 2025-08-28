@@ -11,10 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('staff_positions', function (Blueprint $table) {
-            $table->id();
-            $table->string("name");
-            $table->timestamps();
+        Schema::table('companies', function (Blueprint $table) {
+            $table->foreign('owner_id')->references('id')->on('users')->cascadeOnUpdate()->nullOnDelete();
         });
     }
 
@@ -23,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('staff_positions');
+        Schema::table('companies', function (Blueprint $table) {
+            $table->dropForeign(['owner_id']);
+        });
     }
 };

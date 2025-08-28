@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('companies', function (Blueprint $table) {
+        Schema::create('gps_devices', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->foreignId('business_type_id')->nullable()->constrained('business_types')->casecadeOnUpdate()->nullOnDelete();
-            $table->string('address');
-            $table->string('phone')->nullable();
-            $table->string('npwp')->nullable();
+            $table->string('name')->unique();
+            $table->string('serial_number')->unique();
+            $table->string('model')->nullable();
+            $table->string('provider')->nullable();
+            $table->foreignId('company_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->timestamps();
         });
     }
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('companies');
+        Schema::dropIfExists('gps_devices');
     }
 };

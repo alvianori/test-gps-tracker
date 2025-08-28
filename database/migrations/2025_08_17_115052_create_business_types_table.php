@@ -11,10 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('customer_categories', function (Blueprint $table) {
+        Schema::create('business_types', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('company_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
-            $table->string('name');
+            $table->string('name')->unique();
             $table->text('description')->nullable();
             $table->timestamps();
         });
@@ -25,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('customer_categories');
+        Schema::dropIfExists('business_types');
     }
 };

@@ -11,15 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('areas', function (Blueprint $table) {
+        Schema::create('departments', function (Blueprint $table) {
             $table->id();
-            $table->string('province');
-            $table->string('city');
-            $table->string('subdistrict');
-            $table->string('postal_code');
-            $table->string('street_name')->nullable();
-            $table->string('house_number')->nullable();
-
+            $table->unsignedBigInteger('company_id');
+            $table->string('name');
+            $table->text('description')->nullable();
             $table->timestamps();
         });
     }
@@ -29,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('areas');
+        Schema::dropIfExists('departments');
     }
 };

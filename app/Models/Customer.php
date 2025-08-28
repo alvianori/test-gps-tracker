@@ -10,19 +10,14 @@ class Customer extends Model
         'name',
         'email',
         'phone',
+        'address',
         'customer_category_id',
-        'area_id',
         'company_id'
     ];
 
     public function category()
     {
         return $this->belongsTo(CustomerCategory::class, 'customer_category_id');
-    }
-
-    public function area()
-    {
-        return $this->belongsTo(Area::class, 'area_id');
     }
 
     public function company()

@@ -10,6 +10,10 @@ class Company extends Model
     use HasFactory;
     protected $fillable = [
         'name',
+        'slug',
+        'business_type_id',
+        'owner_id',
+        'email',
         'address',
         'phone',
         'npwp',
@@ -17,18 +21,36 @@ class Company extends Model
 
     public function users()
     {
-        return $this->belongsToMany(User::class, 'staff_companies')
-            ->withPivot('staff_position_id', 'phone', 'address')
-            ->withTimestamps();
-    }
-
-    public function staff()
-    {
-        return $this->hasMany(StaffCompany::class);
+        return $this->hasMany(User::class);
     }
 
     public function businessType()
     {
         return $this->belongsTo(BusinessType::class);
+    }
+
+    public function owner()
+    {
+        return $this->belongsTo(User::class, 'owner_id');
+    }
+
+    public function departments()
+    {
+        return $this->hasMany(Department::class);
+    }
+
+    public function positions()
+    {
+        return $this->hasMany(Position::class);
+    }
+
+    public function customers()
+    {
+        return $this->hasMany(Customer::class);
+    }
+
+    public function fleets()
+    {
+        return $this->hasMany(Fleet::class);
     }
 }

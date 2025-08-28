@@ -2,31 +2,37 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\Company;
-use App\Models\BusinessType;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class CompanySeeder extends Seeder
 {
     public function run(): void
     {
-        $type1 = BusinessType::where('name', 'Perdagangan')->first();
-        $type2 = BusinessType::where('name', 'Jasa')->first();
+        $companies = [
+            [
+                'name' => 'PT Tracking Indonesia',
+                'slug' => Str::slug('PT Tracking Indonesia'),
+                'email' => 'info@tracking.id',
+                'business_type_id' => 1, // Transportasi
+                'address' => 'Jl. Raya Jakarta No. 123, Jakarta Pusat',
+                'phone' => '021-12345678',
+                'npwp' => '01.234.567.8-123.000'
+            ],
+            [
+                'name' => 'PT Logistik Cepat',
+                'slug' => Str::slug('PT Logistik Cepat'),
+                'email' => 'info@logistikcepat.id',
+                'business_type_id' => 2, // Logistik
+                'address' => 'Jl. Raya Bandung No. 456, Bandung',
+                'phone' => '022-87654321',
+                'npwp' => '02.345.678.9-234.000'
+            ],
+        ];
 
-        Company::create([
-            'name' => 'PT Maju Jaya',
-            'address' => 'Jl. Sudirman No. 1, Jakarta',
-            'phone' => '08129876501',
-            'npwp' => '12.345.678.9-012.345',
-            'business_type_id' => $type1?->id,
-        ]);
-
-        Company::create([
-            'name' => 'CV Berkah Abadi',
-            'address' => 'Jl. Merdeka No. 99, Bandung',
-            'phone' => '08129876502',
-            'npwp' => '98.765.432.1-098.765',
-            'business_type_id' => $type2?->id,
-        ]);
+        foreach ($companies as $company) {
+            Company::create($company);
+        }
     }
 }

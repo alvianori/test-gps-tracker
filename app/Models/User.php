@@ -23,6 +23,9 @@ class User extends Authenticatable
         'email',
         'username',
         'password',
+        'company_id',
+        'department_id',
+        'position_id',
     ];
 
     /**
@@ -48,10 +51,33 @@ class User extends Authenticatable
         ];
     }
 
-    public function companies()
+    public function company()
     {
-        return $this->belongsToMany(Company::class, 'staff_companies')
-            ->withPivot('staff_position_id', 'phone', 'address')
-            ->withTimestamps();
+        return $this->belongsTo(Company::class);
+    }
+
+    public function department()
+    {
+        return $this->belongsTo(Department::class);
+    }
+
+    public function position()
+    {
+        return $this->belongsTo(Position::class);
+    }
+
+    public function detail()
+    {
+        return $this->hasOne(UserDetail::class);
+    }
+
+    public function fleetUsers()
+    {
+        return $this->hasMany(FleetUser::class);
+    }
+
+    public function fleets()
+    {
+        return $this->belongsToMany(Fleet::class, FleetUser::class);
     }
 }

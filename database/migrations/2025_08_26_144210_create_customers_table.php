@@ -16,10 +16,11 @@ return new class extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->string('phone')->nullable();
+            $table->text('address')->nullable();
 
             // Relasi
             $table->foreignId('customer_category_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
-            $table->foreignId('area_id')->nullable()->constrained()->cascadeOnUpdate()->nullOnDelete();
+            //$table->foreignId('area_id')->nullable()->constrained()->cascadeOnUpdate()->nullOnDelete();
             $table->foreignId('company_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
 
             $table->timestamps();

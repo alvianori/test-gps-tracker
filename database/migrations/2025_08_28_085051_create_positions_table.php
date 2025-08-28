@@ -11,16 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('fleets', function (Blueprint $table) {
+        Schema::create('positions', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('company_id');
             $table->string('name');
-            $table->string('plate_number')->unique();
-            $table->string('machine_number')->unique();
-
-            // Relasi
-            $table->foreignId('fleet_category_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
-            $table->foreignId('company_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
-
+            $table->text('description')->nullable();
             $table->timestamps();
         });
     }
@@ -30,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('fleets');
+        Schema::dropIfExists('positions');
     }
 };

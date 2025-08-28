@@ -2,32 +2,53 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\Customer;
-use App\Models\CustomerCategory;
-use App\Models\Area;
-use App\Models\Company;
-use Faker\Factory as Faker;
+use Illuminate\Database\Seeder;
 
 class CustomerSeeder extends Seeder
 {
     public function run(): void
     {
-        $faker = Faker::create();
+        $customers = [
+            // Untuk PT Tracking Indonesia (company_id = 1)
+            [
+                'name' => 'PT Maju Bersama',
+                'email' => 'info@majubersama.com',
+                'phone' => '021-5551234',
+                'address' => 'Jl. Raya Maju No. 123, Jakarta',
+                'customer_category_id' => 1, // Perusahaan
+                'company_id' => 1,
+            ],
+            [
+                'name' => 'Dinas Perhubungan DKI Jakarta',
+                'email' => 'dishub@jakarta.go.id',
+                'phone' => '021-5552345',
+                'address' => 'Jl. Raya Pemerintah No. 456, Jakarta',
+                'customer_category_id' => 3, // Pemerintah
+                'company_id' => 1,
+            ],
+            
+            // Untuk PT Logistik Cepat (company_id = 2)
+            [
+                'name' => 'PT Sukses Selalu',
+                'email' => 'info@suksesselalu.com',
+                'phone' => '021-5553456',
+                'address' => 'Jl. Raya Sukses No. 789, Jakarta',
+                'customer_category_id' => 1, // Perusahaan
+                'company_id' => 2,
+            ],
+            [
+                'name' => 'PT Pertamina',
+                'email' => 'info@pertamina.co.id',
+                'phone' => '021-5554567',
+                'address' => 'Jl. Raya BUMN No. 101, Jakarta',
+                'customer_category_id' => 4, // BUMN
+                'company_id' => 2,
+            ],
+        ];
 
-        $categories = CustomerCategory::all();
-        $areas = Area::all();
-        $companies = Company::all();
-
-        for ($i = 0; $i < 20; $i++) {
-            Customer::create([
-                'name' => $faker->name,
-                'email' => $faker->unique()->safeEmail,
-                'phone' => $faker->phoneNumber,
-                'customer_category_id' => $categories->random()->id,
-                'area_id' => $areas->random()->id,
-                'company_id' => $companies->random()->id,
-            ]);
+        foreach ($customers as $customer) {
+            Customer::create($customer);
         }
     }
 }

@@ -11,7 +11,6 @@ class Fleet extends Model
         'plate_number',
         'machine_number',
         'fleet_category_id',
-        'staff_company_id',
         'company_id'
     ];
 
@@ -20,13 +19,19 @@ class Fleet extends Model
         return $this->belongsTo(FleetCategory::class, 'fleet_category_id');
     }
 
-    public function staff()
-    {
-        return $this->belongsTo(StaffCompany::class, 'staff_company_id');
-    }
 
     public function company()
     {
         return $this->belongsTo(Company::class);
+    }
+
+    public function fleetUsers()
+    {
+        return $this->hasMany(FleetUser::class);
+    }
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class, FleetUser::class);
     }
 }
