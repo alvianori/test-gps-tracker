@@ -12,8 +12,7 @@ class GpsDevice extends Model
     
     protected $fillable = [
         'name',
-        'serial_number',
-        'model',
+        'code',
         'provider',
         'company_id'
     ];
@@ -31,5 +30,20 @@ class GpsDevice extends Model
     public function company()
     {
         return $this->belongsTo(Company::class);
+    }
+    
+    public function gpsTracks()
+    {
+        return $this->hasMany(GpsTrack::class);
+    }
+    
+    public function fleetGps()
+    {
+        return $this->hasMany(FleetGps::class);
+    }
+    
+    public function fleets()
+    {
+        return $this->belongsToMany(Fleet::class, FleetGps::class);
     }
 }

@@ -12,40 +12,35 @@ class GpsDeviceSeeder extends Seeder
         $devices = [
             // Untuk PT Tracking Indonesia (company_id = 1)
             [
-                'name' => 'GPS-TRK-001',
-                'serial_number' => 'GPS001-2023',
-                'model' => 'GT06N',
-                'provider' => 'Concox',
+                'name' => 'Atalanta',
+                'code' => 'ATL001',
+                'provider' => '+6281234567890',
                 'company_id' => 1,
             ],
             [
-                'name' => 'GPS-BUS-001',
-                'serial_number' => 'GPS002-2023',
-                'model' => 'TK103B',
-                'provider' => 'Coban',
+                'name' => 'Poseidon',
+                'code' => 'PSD001',
+                'provider' => '+6281234567891',
                 'company_id' => 1,
             ],
             [
-                'name' => 'GPS-CAR-001',
-                'serial_number' => 'GPS003-2023',
-                'model' => 'GT06E',
-                'provider' => 'Concox',
+                'name' => 'Hermes',
+                'code' => 'HRM001',
+                'provider' => '+6281234567892',
                 'company_id' => 1,
             ],
             
             // Untuk PT Logistik Cepat (company_id = 2)
             [
-                'name' => 'GPS-TRK-101',
-                'serial_number' => 'GPS101-2023',
-                'model' => 'TK103B',
-                'provider' => 'Coban',
+                'name' => 'Zeus',
+                'code' => 'ZS001',
+                'provider' => '+6281234567893',
                 'company_id' => 2,
             ],
             [
-                'name' => 'GPS-MTR-101',
-                'serial_number' => 'GPS102-2023',
-                'model' => 'GT06N',
-                'provider' => 'Concox',
+                'name' => 'Apollo',
+                'code' => 'APL001',
+                'provider' => '+6281234567894',
                 'company_id' => 2,
             ],
         ];

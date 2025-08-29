@@ -34,23 +34,19 @@ class GpsDeviceResource extends Resource
                             ->label('Nama Perangkat')
                             ->required()
                             ->maxLength(255)
-                            ->placeholder('Masukkan nama perangkat GPS'),
-                        Forms\Components\TextInput::make('serial_number')
-                            ->label('Nomor Seri')
+                            ->placeholder('Masukkan nama perangkat GPS, contoh: Atalanta'),
+                        Forms\Components\TextInput::make('code')
+                            ->label('Kode Perangkat')
                             ->required()
                             ->maxLength(255)
-                            ->placeholder('Masukkan nomor seri perangkat')
+                            ->placeholder('Masukkan kode perangkat, contoh: ATL001')
                             ->unique(ignoreRecord: true),
-                        Forms\Components\TextInput::make('model')
-                            ->label('Model')
-                            ->required()
-                            ->maxLength(255)
-                            ->placeholder('Masukkan model perangkat'),
                         Forms\Components\TextInput::make('provider')
-                            ->label('Penyedia')
+                            ->label('Nomor Telepon Provider')
                             ->required()
                             ->maxLength(255)
-                            ->placeholder('Masukkan nama penyedia perangkat'),
+                            ->placeholder('Masukkan nomor telepon provider, contoh: +628123456789')
+                            ->tel(),
                         Forms\Components\Select::make('company_id')
                             ->label('Perusahaan')
                             ->relationship('company', 'name')
@@ -75,17 +71,13 @@ class GpsDeviceResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->icon('heroicon-o-device-phone-mobile'),
-                Tables\Columns\TextColumn::make('serial_number')
-                    ->label('Nomor Seri')
+                Tables\Columns\TextColumn::make('code')
+                    ->label('Kode Perangkat')
                     ->searchable()
                     ->sortable()
                     ->copyable(),
-                Tables\Columns\TextColumn::make('model')
-                    ->label('Model')
-                    ->searchable()
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('provider')
-                    ->label('Penyedia')
+                    ->label('Nomor Telepon')
                     ->searchable()
                     ->sortable()
                     ->badge()

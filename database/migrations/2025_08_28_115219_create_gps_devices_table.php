@@ -13,10 +13,9 @@ return new class extends Migration
     {
         Schema::create('gps_devices', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique();
-            $table->string('serial_number')->unique();
-            $table->string('model')->nullable();
-            $table->string('provider')->nullable();
+            $table->string('name')->unique(); // Nama GPS seperti Atalanta
+            $table->string('code')->unique(); // Kode GPS seperti ATL001
+            $table->string('provider')->nullable(); // Format nomor telepon +628xxx
             $table->foreignId('company_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->timestamps();
         });

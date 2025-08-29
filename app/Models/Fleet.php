@@ -47,4 +47,14 @@ class Fleet extends Model
     {
         return $this->belongsToMany(User::class, FleetUser::class);
     }
+    
+    public function fleetGps()
+    {
+        return $this->hasMany(FleetGps::class);
+    }
+    
+    public function gpsDevices()
+    {
+        return $this->belongsToMany(GpsDevice::class, FleetGps::class);
+    }
 }
