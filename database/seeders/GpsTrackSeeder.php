@@ -63,12 +63,31 @@ class GpsTrackSeeder extends Seeder
                     'longitude' => $coordinate['longitude'],
                     'speed' => rand(0, 80), // Kecepatan acak antara 0-80 km/jam
                     'course' => rand(0, 360), // Arah acak 0-360 derajat
-                    'direction' => rand(0, 360), // Arah dalam derajat (0-360)
+                    'direction' => $this->getRandomDirection(), // Arah dalam bahasa Indonesia sebagai string
                     'devices_timestamp' => $timestamp,
                 ]);
             }
         }
     }
     
-    // Fungsi getDirection dihapus karena kolom direction di database adalah float
+    /**
+     * Mendapatkan arah acak dalam bahasa Indonesia
+     * Menghasilkan string direction sesuai format yang diharapkan oleh IoT
+     */
+    private function getRandomDirection()
+    {
+        $directions = [
+            'Utara',
+            'Timur Laut',
+            'Timur',
+            'Tenggara',
+            'Selatan',
+            'Barat Daya',
+            'Barat',
+            'Barat Laut',
+            'Diam'
+        ];
+        
+        return $directions[array_rand($directions)];
+    }
 }

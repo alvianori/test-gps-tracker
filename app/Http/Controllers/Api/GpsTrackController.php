@@ -12,26 +12,89 @@ use Illuminate\Support\Facades\Log;
 class GpsTrackController extends Controller
 {
     /**
-     * Konversi direction dari string ke float
+     * Konversi direction ke format string standar
+     * Menerima input string dari IoT dan memastikan format yang konsisten
      */
     private function convertDirection($direction)
     {
-        if (is_string($direction)) {
-            // Konversi arah mata angin ke derajat
-            $directionMap = [
-                'N' => 0,    // North
-                'NE' => 45,  // Northeast
-                'E' => 90,   // East
-                'SE' => 135, // Southeast
-                'S' => 180,  // South
-                'SW' => 225, // Southwest
-                'W' => 270,  // West
-                'NW' => 315, // Northwest
-            ];
-            return $directionMap[strtoupper($direction)] ?? 0;
+        if (empty($direction)) {
+            return null;
         }
-        
-        return $direction;
+
+        // Jika input sudah berupa string, standarisasi formatnya
+        if (is_string($direction)) {
+            $direction = strtolower($direction);
+
+            // Mapping untuk standarisasi berbagai kemungkinan input
+            $directionMap = [
+                // Bahasa Indonesia
+                'utara' => 'Utara',
+                'u' => 'Utara',
+                'timur' => 'Timur',
+                't' => 'Timur',
+                'selatan' => 'Selatan',
+                's' => 'Selatan',
+                'barat' => 'Barat',
+                'b' => 'Barat',
+                'timur laut' => 'Timur Laut',
+                'tl' => 'Timur Laut',
+                'tenggara' => 'Tenggara',
+                'tg' => 'Tenggara',
+                'barat daya' => 'Barat Daya',
+                'bd' => 'Barat Daya',
+                'barat laut' => 'Barat Laut',
+                'bl' => 'Barat Laut',
+                'diam' => 'Diam',
+
+                // English (untuk kompatibilitas)
+                'north' => 'Utara',
+                'n' => 'Utara',
+                'east' => 'Timur',
+                'e' => 'Timur',
+                'south' => 'Selatan',
+                'west' => 'Barat',
+                'w' => 'Barat',
+                'northeast' => 'Timur Laut',
+                'ne' => 'Timur Laut',
+                'southeast' => 'Tenggara',
+                'se' => 'Tenggara',
+                'southwest' => 'Barat Daya',
+                'sw' => 'Barat Daya',
+                'northwest' => 'Barat Laut',
+                'nw' => 'Barat Laut',
+                'stationary' => 'Diam',
+            ];
+
+            return $directionMap[$direction] ?? $direction;
+        }
+
+        // Jika input berupa angka (untuk kompatibilitas dengan data lama)
+        if (is_numeric($direction)) {
+            $degree = floatval($direction);
+
+            // Konversi derajat ke arah mata angin dalam Bahasa Indonesia
+            if ($degree == 0) {
+                return 'Diam';
+            } elseif ($degree >= 337.5 || $degree < 22.5) {
+                return 'Utara';
+            } elseif ($degree >= 22.5 && $degree < 67.5) {
+                return 'Timur Laut';
+            } elseif ($degree >= 67.5 && $degree < 112.5) {
+                return 'Timur';
+            } elseif ($degree >= 112.5 && $degree < 157.5) {
+                return 'Tenggara';
+            } elseif ($degree >= 157.5 && $degree < 202.5) {
+                return 'Selatan';
+            } elseif ($degree >= 202.5 && $degree < 247.5) {
+                return 'Barat Daya';
+            } elseif ($degree >= 247.5 && $degree < 292.5) {
+                return 'Barat';
+            } elseif ($degree >= 292.5 && $degree < 337.5) {
+                return 'Barat Laut';
+            }
+        }
+
+        return 'Tidak Diketahui';
     }
     /**
      * Store a newly created resource in storage.
@@ -58,7 +121,7 @@ class GpsTrackController extends Controller
 
         // Konversi direction menggunakan helper method
         $direction = $this->convertDirection($validated['direction']);
-        
+
         // Simpan data GPS track
         $gpsTrack = GpsTrack::create([
             'gps_device_id' => $gpsDevice->id,
@@ -257,7 +320,7 @@ class GpsTrackController extends Controller
                 case 'yearly':
                     $query->whereBetween('devices_timestamp', [$now->copy()->startOfYear(), $now->copy()->endOfYear()]);
                     break;
-                    
+
                 case 'all':
                     // Tidak perlu filter tambahan, ambil semua data
                     break;

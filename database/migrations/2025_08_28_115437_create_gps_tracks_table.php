@@ -18,7 +18,7 @@ return new class extends Migration
             $table->decimal('longitude', 10, 7);
             $table->float('speed')->nullable();
             $table->float('course')->nullable();
-            $table->float('direction')->nullable();
+            $table->string('direction')->nullable();
             $table->timestamp('devices_timestamp');
             $table->timestamps();
         });
