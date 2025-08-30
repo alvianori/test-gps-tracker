@@ -109,7 +109,7 @@ class GpsTrackController extends Controller
             'speed' => 'nullable|numeric|min:0',
             'course' => 'nullable|numeric|between:0,360',
             'direction' => 'nullable',
-            'devices_timestamp' => 'required|date_format:Y-m-d H:i:s',
+            'devices_timestamp' => 'nullable|date_format:Y-m-d H:i:s',
         ], [
             'device_code.exists' => 'GPS device dengan kode tersebut tidak ditemukan.',
             'devices_timestamp.date_format' => 'Format timestamp harus Y-m-d H:i:s (contoh: 2024-01-15 10:30:00).'
@@ -122,6 +122,12 @@ class GpsTrackController extends Controller
         // Konversi direction menggunakan helper method
         $direction = $this->convertDirection($validated['direction']);
 
+        // Cek apakah timestamp adalah nilai default dari ESP
+        $deviceTimestamp = $validated['devices_timestamp'];
+        if ($deviceTimestamp === '1970-01-01 00:00:00') {
+            $deviceTimestamp = null; // Akan menggunakan nilai default dari database (CURRENT_TIMESTAMP)
+        }
+        
         // Simpan data GPS track
         $gpsTrack = GpsTrack::create([
             'gps_device_id' => $gpsDevice->id,
@@ -130,7 +136,7 @@ class GpsTrackController extends Controller
             'speed' => $validated['speed'],
             'course' => $validated['course'],
             'direction' => $direction,
-            'devices_timestamp' => $validated['devices_timestamp'],
+            'devices_timestamp' => $deviceTimestamp,
         ]);
 
         return response()->json([
@@ -162,7 +168,7 @@ class GpsTrackController extends Controller
                 'data.*.speed' => 'nullable|numeric|min:0',
                 'data.*.course' => 'nullable|numeric|between:0,360',
                 'data.*.direction' => 'nullable',
-                'data.*.devices_timestamp' => 'required|date_format:Y-m-d H:i:s',
+                'data.*.devices_timestamp' => 'nullable|date_format:Y-m-d H:i:s',
             ], [
                 'device_code.exists' => 'GPS device dengan kode tersebut tidak ditemukan.',
                 'data.*.devices_timestamp.date_format' => 'Format timestamp harus Y-m-d H:i:s (contoh: 2024-01-15 10:30:00).'
@@ -173,6 +179,12 @@ class GpsTrackController extends Controller
 
             $insertData = [];
             foreach ($validated['data'] as $row) {
+                // Cek apakah timestamp adalah nilai default dari ESP
+                $deviceTimestamp = $row['devices_timestamp'];
+                if ($deviceTimestamp === '1970-01-01 00:00:00') {
+                    $deviceTimestamp = null; // Akan menggunakan nilai default dari database (CURRENT_TIMESTAMP)
+                }
+                
                 $insertData[] = [
                     'gps_device_id' => $gpsDevice->id,
                     'latitude' => $row['latitude'],
@@ -180,7 +192,7 @@ class GpsTrackController extends Controller
                     'speed' => $row['speed'] ?? null,
                     'course' => $row['course'] ?? null,
                     'direction' => $this->convertDirection($row['direction'] ?? null),
-                    'devices_timestamp' => $row['devices_timestamp'],
+                    'devices_timestamp' => $deviceTimestamp,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ];
