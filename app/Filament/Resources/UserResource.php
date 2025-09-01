@@ -37,6 +37,15 @@ class UserResource extends Resource
                             ->maxLength(255)
                             ->placeholder('Masukkan nama lengkap')
                             ->columnSpan(2),
+                        Forms\Components\TextInput::make('phone')
+                            ->label('Nomor Telepon')
+                            ->tel()
+                            ->required()
+                            ->maxLength(20)
+                            ->placeholder('8xxxxxxxxxx')
+                            ->prefix('+62')
+                            ->regex('/^[0-9]{9,15}$/')
+                            ->validationAttribute('nomor telepon'),
                         Forms\Components\TextInput::make('email')
                             ->label('Email')
                             ->email()
@@ -122,6 +131,11 @@ class UserResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->icon('heroicon-o-envelope')
+                    ->copyable(),
+                Tables\Columns\TextColumn::make('phone')
+                    ->label('Telepon')
+                    ->searchable()
+                    ->icon('heroicon-o-phone')
                     ->copyable(),
                 Tables\Columns\TextColumn::make('company.name')
                     ->label('Perusahaan')

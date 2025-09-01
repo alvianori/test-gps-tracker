@@ -16,6 +16,7 @@ class UserSeeder extends Seeder
             'name' => 'Super Admin',
             'email' => 'superadmin@example.com',
             'username' => 'superadmin',
+            'phone' => '81211111111',
             'password' => Hash::make('password'),
             'company_id' => 1,
             'department_id' => 1, // IT
@@ -34,6 +35,7 @@ class UserSeeder extends Seeder
             'name' => 'Admin Tracking',
             'email' => 'admin@tracking.id',
             'username' => 'admintracking',
+            'phone' => '81222222222',
             'password' => Hash::make('password'),
             'company_id' => 1,
             'department_id' => 1, // IT
@@ -52,6 +54,7 @@ class UserSeeder extends Seeder
             'name' => 'Admin Logistik',
             'email' => 'admin@logistikcepat.id',
             'username' => 'adminlogistik',
+            'phone' => '81233333333',
             'password' => Hash::make('password'),
             'company_id' => 2,
             'department_id' => 5, // IT
@@ -70,6 +73,7 @@ class UserSeeder extends Seeder
             'name' => 'User Tracking',
             'email' => 'user@tracking.id',
             'username' => 'usertracking',
+            'phone' => '81244444444',
             'password' => Hash::make('password'),
             'company_id' => 1,
             'department_id' => 1, // IT
@@ -88,6 +92,7 @@ class UserSeeder extends Seeder
             'name' => 'User Logistik',
             'email' => 'user@logistikcepat.id',
             'username' => 'userlogistik',
+            'phone' => '81255555555',
             'password' => Hash::make('password'),
             'company_id' => 2,
             'department_id' => 5, // IT
