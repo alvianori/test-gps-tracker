@@ -27,22 +27,25 @@ class BusinessTypeResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('Informasi Jenis Bisnis')
-                    ->description('Masukkan informasi jenis bisnis')
-                    ->icon('heroicon-o-building-office')
+                Forms\Components\Card::make()
                     ->schema([
-                        Forms\Components\TextInput::make('name')
-                            ->label('Nama Jenis Bisnis')
-                            ->required()
-                            ->maxLength(255)
-                            ->placeholder('Masukkan nama jenis bisnis')
-                            ->unique(ignoreRecord: true),
-                        Forms\Components\Textarea::make('description')
-                            ->label('Deskripsi')
-                            ->placeholder('Masukkan deskripsi jenis bisnis')
-                            ->rows(3)
-                            ->columnSpanFull(),
-                    ]),
+                        Forms\Components\Grid::make(2)
+                            ->schema([
+                                Forms\Components\TextInput::make('name')
+                                    ->label('Nama Kategori Armada')
+                                    ->placeholder('Contoh: Bus, Truk, Pick-up')
+                                    ->required()
+                                    ->maxLength(100)
+                                    ->prefixIcon('heroicon-o-truck'),
+
+                                Forms\Components\Textarea::make('description')
+                                    ->label('Deskripsi')
+                                    ->placeholder('Masukkan deskripsi kategori armada...')
+                                    ->rows(3)
+                                    ->columnSpanFull(),
+                            ]),
+                    ])
+                    ->columns(2),
             ]);
     }
 
@@ -50,35 +53,37 @@ class BusinessTypeResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('index')
+                    ->label('No')
+                    ->rowIndex()
+                    ->sortable(false)
+                    ->searchable(false)
+                    ->alignCenter(),
+
                 Tables\Columns\TextColumn::make('name')
-                    ->label('Nama Jenis Bisnis')
+                    ->label('Nama Kategori Armada')
                     ->searchable()
                     ->sortable()
-                    ->icon('heroicon-o-building-office'),
+                    ->icon('heroicon-o-truck'),
+
                 Tables\Columns\TextColumn::make('description')
                     ->label('Deskripsi')
                     ->limit(50)
-                    ->tooltip(function (Tables\Columns\TextColumn $column): ?string {
-                        $state = $column->getState();
-                        if (strlen($state) <= 50) {
-                            return null;
-                        }
-                        return $state;
-                    }),
+                    ->tooltip(fn ($state) => strlen($state) > 50 ? $state : null),
+
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Dibuat Pada')
                     ->dateTime('d M Y, H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label('Diperbarui Pada')
                     ->dateTime('d M Y, H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->filters([
-                //
-            ])
+            ->filters([])
             ->actions([
                 Tables\Actions\EditAction::make(),
             ])
@@ -88,6 +93,7 @@ class BusinessTypeResource extends Resource
                 ]),
             ]);
     }
+    
 
     public static function getRelations(): array
     {

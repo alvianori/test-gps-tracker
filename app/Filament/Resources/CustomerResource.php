@@ -37,6 +37,7 @@ class CustomerResource extends Resource
                             ->maxLength(255)
                             ->placeholder('Masukkan nama pelanggan')
                             ->columnSpan(2),
+    
                         Forms\Components\TextInput::make('email')
                             ->label('Email')
                             ->email()
@@ -44,6 +45,7 @@ class CustomerResource extends Resource
                             ->maxLength(255)
                             ->placeholder('email@example.com')
                             ->unique(ignoreRecord: true),
+    
                         Forms\Components\TextInput::make('phone')
                             ->label('Nomor Telepon')
                             ->tel()
@@ -53,17 +55,26 @@ class CustomerResource extends Resource
                             ->placeholder('8xxxxxxxxxx')
                             ->regex('/^[0-9]{9,15}$/')
                             ->validationAttribute('nomor telepon'),
+    
                         Forms\Components\Select::make('customer_category_id')
                             ->label('Kategori Pelanggan')
                             ->relationship('category', 'name')
-                            ->getOptionLabelFromRecordUsing(fn ($record) => "{$record->name} - {$record->company->name}")
+                            ->getOptionLabelFromRecordUsing(
+                                fn ($record) => "{$record->name} - {$record->company->name}"
+                            )
                             ->required()
                             ->searchable()
                             ->preload(),
+    
                         Forms\Components\Hidden::make('company_id')
-                            ->default(fn() => auth()->user()->hasRole('super_admin') ? 1 : auth()->user()->company_id),
+                            ->default(
+                                fn () => auth()->user()->hasRole('super_admin')
+                                    ? 1
+                                    : auth()->user()->company_id
+                            ),
                     ])
                     ->columns(2),
+    
                 Forms\Components\Section::make('Alamat')
                     ->icon('heroicon-o-map-pin')
                     ->schema([
@@ -76,58 +87,65 @@ class CustomerResource extends Resource
                     ]),
             ]);
     }
+    
 
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('index')
+                    ->label('No')
+                    ->rowIndex()
+                    ->alignCenter()
+                    ->sortable(false)
+                    ->searchable(false),
+
                 Tables\Columns\TextColumn::make('name')
                     ->label('Nama')
                     ->searchable()
                     ->sortable()
-                    ->weight('bold'),
+                    ->weight('bold')
+                    ->icon('heroicon-o-user'),
+
                 Tables\Columns\TextColumn::make('email')
                     ->label('Email')
                     ->searchable()
                     ->sortable()
                     ->icon('heroicon-o-envelope')
                     ->copyable(),
+
                 Tables\Columns\TextColumn::make('phone')
                     ->label('Telepon')
                     ->searchable()
                     ->sortable()
                     ->icon('heroicon-o-phone')
                     ->copyable(),
+
                 Tables\Columns\TextColumn::make('category.name')
                     ->label('Kategori')
                     ->sortable()
                     ->badge()
                     ->color('success'),
+
                 Tables\Columns\TextColumn::make('address')
                     ->label('Alamat')
                     ->limit(30)
-                    ->tooltip(function (Tables\Columns\TextColumn $column): ?string {
-                        $state = $column->getState();
-                        if (strlen($state) <= 30) {
-                            return null;
-                        }
-                        return $state;
-                    })
+                    ->tooltip(fn ($state) => strlen($state) > 30 ? $state : null)
                     ->toggleable(),
+
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Dibuat')
                     ->dateTime('d M Y')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label('Diperbarui')
                     ->dateTime('d M Y')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->filters([
-                //
-            ])
+            ->filters([])
             ->actions([
                 Tables\Actions\EditAction::make(),
             ])

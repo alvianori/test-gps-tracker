@@ -31,61 +31,76 @@ class FleetCategoryResource extends Resource
                     ->description('Masukkan informasi kategori kendaraan')
                     ->icon('heroicon-o-tag')
                     ->schema([
-                        Forms\Components\TextInput::make('name')
-                            ->label('Nama Kategori')
-                            ->required()
-                            ->maxLength(255)
-                            ->placeholder('Masukkan nama kategori')
-                            ->unique(ignoreRecord: true),
-                        Forms\Components\Textarea::make('description')
-                            ->label('Deskripsi')
-                            ->placeholder('Masukkan deskripsi kategori')
-                            ->rows(3)
-                            ->columnSpanFull(),
-                        Forms\Components\Select::make('company_id')
-                            ->label('Perusahaan')
-                            ->relationship('company', 'name')
-                            ->searchable()
-                            ->preload()
-                            ->required()
-                            ->visible(fn() => auth()->user()->hasRole('super_admin'))
-                            ->default(fn() => auth()->user()->hasRole('super_admin') ? null : auth()->user()->company_id),
+                        Forms\Components\Grid::make(2)->schema([
+                            Forms\Components\TextInput::make('name')
+                                ->label('Nama Kategori')
+                                ->required()
+                                ->maxLength(255)
+                                ->placeholder('Contoh: SUV, Sedan, Truck')
+                                ->unique(ignoreRecord: true)
+                                ->prefixIcon('heroicon-o-tag')
+                                ->helperText('Nama kategori kendaraan harus unik.'),
+    
+                            Forms\Components\Select::make('company_id')
+                                ->label('Perusahaan')
+                                ->relationship('company', 'name')
+                                ->searchable()
+                                ->preload()
+                                ->required()
+                                ->prefixIcon('heroicon-o-building-office')
+                                ->visible(fn() => auth()->user()->hasRole('super_admin'))
+                                ->default(fn() => auth()->user()->hasRole('super_admin') ? null : auth()->user()->company_id),
+                        ]),
+    
                         Forms\Components\Hidden::make('company_id')
                             ->default(fn() => auth()->user()->company_id)
                             ->visible(fn() => !auth()->user()->hasRole('super_admin')),
+    
+                        Forms\Components\Textarea::make('description')
+                            ->label('Deskripsi')
+                            ->placeholder('Masukkan deskripsi kategori kendaraan')
+                            ->rows(3)
+                            ->columnSpanFull(),
                     ]),
             ]);
     }
+    
 
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('rowIndex')
+                    ->label('No')
+                    ->rowIndex()
+                    ->sortable(false),
+    
                 Tables\Columns\TextColumn::make('name')
                     ->label('Nama Kategori')
                     ->searchable()
                     ->sortable()
-                    ->weight('bold'),
+                    ->weight('bold')
+                    ->icon('heroicon-o-tag'),
+    
                 Tables\Columns\TextColumn::make('description')
                     ->label('Deskripsi')
                     ->limit(50)
-                    ->tooltip(function (Tables\Columns\TextColumn $column): ?string {
-                        $state = $column->getState();
-                        if (strlen($state) <= 50) {
-                            return null;
-                        }
-                        return $state;
-                    })
+                    ->tooltip(fn ($record) => $record->description)
                     ->toggleable(),
+    
                 Tables\Columns\TextColumn::make('company.name')
                     ->label('Perusahaan')
                     ->sortable()
-                    ->searchable(),
+                    ->searchable()
+                    ->badge()
+                    ->color('info'),
+    
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Dibuat')
                     ->dateTime('d M Y')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+    
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label('Diperbarui')
                     ->dateTime('d M Y')
@@ -94,13 +109,14 @@ class FleetCategoryResource extends Resource
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('company_id')
-                    ->label('Perusahaan')
+                    ->label('Filter Perusahaan')
                     ->relationship('company', 'name')
                     ->preload()
-                    ->searchable()
+                    ->searchable(),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -108,6 +124,7 @@ class FleetCategoryResource extends Resource
                 ]),
             ]);
     }
+    
 
     public static function getRelations(): array
     {
