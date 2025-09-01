@@ -4,8 +4,6 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\FleetUserResource\Pages;
 use App\Models\FleetUser;
-use App\Models\Fleet;
-use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -18,22 +16,18 @@ class FleetUserResource extends Resource
     protected static ?string $model = FleetUser::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-user-group';
-    
     protected static ?string $navigationGroup = 'Kendaraan';
-    
     protected static ?int $navigationSort = 2;
-    
     protected static ?string $modelLabel = 'Penugasan Kendaraan';
-    
     protected static ?string $pluralModelLabel = 'Penugasan Kendaraan';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('Informasi Penugasan Kendaraan')
-                    ->description('Pilih kendaraan dan pengguna untuk penugasan')
-                    ->icon('heroicon-o-truck')
+                Forms\Components\Section::make('Informasi Penugasan')
+                    ->description('Atur kendaraan, pengguna, dan status penugasan.')
+                    ->icon('heroicon-o-briefcase')
                     ->schema([
                         Forms\Components\Select::make('fleet_id')
                             ->label('Kendaraan')
@@ -41,7 +35,7 @@ class FleetUserResource extends Resource
                                 if (!auth()->user()->hasRole('super_admin')) {
                                     $query->where('company_id', auth()->user()->company_id);
                                 }
-                                // Filter kendaraan yang belum memiliki penugasan pengguna
+                                // filter kendaraan yang sudah dipakai
                                 $assignedFleetIds = \App\Models\FleetUser::pluck('fleet_id')->toArray();
                                 $query->whereNotIn('id', $assignedFleetIds);
                                 return $query;
@@ -49,9 +43,10 @@ class FleetUserResource extends Resource
                             ->required()
                             ->searchable()
                             ->preload()
-                            ->columnSpan(2)
                             ->getOptionLabelFromRecordUsing(fn ($record) => "{$record->name} - {$record->plate_number}")
-                            ->disabled(fn ($livewire) => $livewire instanceof Pages\EditFleetUser),
+                            ->disabled(fn ($livewire) => $livewire instanceof Pages\EditFleetUser)
+                            ->columnSpanFull(),
+
                         Forms\Components\Select::make('user_id')
                             ->label('Pengguna')
                             ->relationship('user', 'name', function (Builder $query) {
@@ -63,19 +58,27 @@ class FleetUserResource extends Resource
                             ->required()
                             ->searchable()
                             ->preload()
-                            ->columnSpan(2)
-                            ->helperText('Jika pengguna sudah memiliki kendaraan aktif lain, kendaraan tersebut akan otomatis dinonaktifkan.'),
+                            ->helperText('Jika pengguna sudah memiliki kendaraan aktif lain, kendaraan tersebut akan otomatis dinonaktifkan.')
+                            ->columnSpanFull(),
+
                         Forms\Components\Toggle::make('active')
                             ->label('Status Aktif')
-                            ->required()
-                            ->default(true),
+                            ->default(true)
+                            ->required(),
+                    ])
+                    ->columns(2),
+
+                Forms\Components\Section::make('Tanggal Penugasan')
+                    ->icon('heroicon-o-calendar')
+                    ->schema([
                         Forms\Components\DateTimePicker::make('assigned_at')
                             ->label('Tanggal Mulai Penugasan')
-                            ->required()
-                            ->default(now()),
+                            ->default(now())
+                            ->required(),
                         Forms\Components\DateTimePicker::make('unassigned_at')
                             ->label('Tanggal Selesai Penugasan')
-                            ->nullable(),
+                            ->nullable()
+                            ->helperText('Kosongkan jika penugasan masih aktif.'),
                     ])
                     ->columns(2),
             ]);
@@ -85,6 +88,9 @@ class FleetUserResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('index')
+                    ->label('#')
+                    ->rowIndex(),
                 Tables\Columns\TextColumn::make('fleet.name')
                     ->label('Kendaraan')
                     ->searchable()
@@ -169,23 +175,21 @@ class FleetUserResource extends Resource
                         ->label('Aktifkan')
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
-                        ->action(fn (\Illuminate\Database\Eloquent\Collection $records) => $records->each->activate()),
+                        ->action(fn ($records) => $records->each->activate()),
                     Tables\Actions\BulkAction::make('deactivate')
                         ->label('Nonaktifkan')
                         ->icon('heroicon-o-x-circle')
                         ->color('danger')
-                        ->action(fn (\Illuminate\Database\Eloquent\Collection $records) => $records->each->deactivate()),
+                        ->action(fn ($records) => $records->each->deactivate()),
                 ]),
             ]);
     }
-    
+
     public static function getRelations(): array
     {
-        return [
-            //
-        ];
+        return [];
     }
-    
+
     public static function getPages(): array
     {
         return [

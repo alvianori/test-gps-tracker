@@ -23,18 +23,7 @@ class CustomerPolicy
      */
     public function view(User $user, Customer $customer): bool
     {
-        // Jika user memiliki permission view_customer
-        if ($user->can('view_customer')) {
-            // Super admin dapat melihat semua data
-            if ($user->hasRole('super_admin')) {
-                return true;
-            }
-            
-            // User lain hanya dapat melihat data dari company mereka sendiri
-            return $user->company_id === $customer->company_id;
-        }
-        
-        return false;
+        return $user->can('view_customer');
     }
 
     /**
@@ -50,18 +39,7 @@ class CustomerPolicy
      */
     public function update(User $user, Customer $customer): bool
     {
-        // Jika user memiliki permission update_customer
-        if ($user->can('update_customer')) {
-            // Super admin dapat mengupdate semua data
-            if ($user->hasRole('super_admin')) {
-                return true;
-            }
-            
-            // User lain hanya dapat mengupdate data dari company mereka sendiri
-            return $user->company_id === $customer->company_id;
-        }
-        
-        return false;
+        return $user->can('update_customer');
     }
 
     /**
@@ -69,18 +47,7 @@ class CustomerPolicy
      */
     public function delete(User $user, Customer $customer): bool
     {
-        // Jika user memiliki permission delete_customer
-        if ($user->can('delete_customer')) {
-            // Super admin dapat menghapus semua data
-            if ($user->hasRole('super_admin')) {
-                return true;
-            }
-            
-            // User lain hanya dapat menghapus data dari company mereka sendiri
-            return $user->company_id === $customer->company_id;
-        }
-        
-        return false;
+        return $user->can('delete_customer');
     }
 
     /**

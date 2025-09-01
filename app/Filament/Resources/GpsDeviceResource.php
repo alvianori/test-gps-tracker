@@ -35,29 +35,37 @@ class GpsDeviceResource extends Resource
                             ->required()
                             ->maxLength(255)
                             ->placeholder('Masukkan nama perangkat GPS, contoh: Atalanta'),
+
                         Forms\Components\TextInput::make('code')
                             ->label('Kode Perangkat')
                             ->required()
                             ->maxLength(255)
                             ->placeholder('Masukkan kode perangkat, contoh: ATL001')
                             ->unique(ignoreRecord: true),
+
                         Forms\Components\TextInput::make('provider')
                             ->label('Nomor Telepon Provider')
                             ->required()
-                            ->maxLength(255)
+                            ->maxLength(20)
                             ->placeholder('Masukkan nomor telepon provider, contoh: +628123456789')
                             ->tel(),
+
                         Forms\Components\Select::make('company_id')
                             ->label('Perusahaan')
                             ->relationship('company', 'name')
                             ->searchable()
                             ->preload()
                             ->required()
-                            ->visible(fn() => auth()->user()->hasRole('super_admin'))
-                            ->default(fn() => auth()->user()->hasRole('super_admin') ? null : auth()->user()->company_id),
+                            ->visible(fn () => auth()->user()->hasRole('super_admin'))
+                            ->default(
+                                fn () => auth()->user()->hasRole('super_admin')
+                                    ? null
+                                    : auth()->user()->company_id
+                            ),
+
                         Forms\Components\Hidden::make('company_id')
-                            ->default(fn() => auth()->user()->company_id)
-                            ->visible(fn() => !auth()->user()->hasRole('super_admin')),
+                            ->default(fn () => auth()->user()->company_id)
+                            ->visible(fn () => !auth()->user()->hasRole('super_admin')),
                     ]),
             ]);
     }
@@ -66,43 +74,53 @@ class GpsDeviceResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('rowIndex')
+                    ->label('#')
+                    ->rowIndex(),
+
                 Tables\Columns\TextColumn::make('name')
                     ->label('Nama Perangkat')
                     ->searchable()
                     ->sortable()
-                    ->icon('heroicon-o-device-phone-mobile'),
+                    ->icon('heroicon-o-device-phone-mobile')
+                    ->weight('bold'),
+
                 Tables\Columns\TextColumn::make('code')
                     ->label('Kode Perangkat')
                     ->searchable()
                     ->sortable()
                     ->copyable(),
+
                 Tables\Columns\TextColumn::make('provider')
                     ->label('Nomor Telepon')
                     ->searchable()
                     ->sortable()
                     ->badge()
                     ->color('success'),
+
                 Tables\Columns\TextColumn::make('company.name')
                     ->label('Perusahaan')
                     ->sortable()
                     ->searchable(),
+
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label('Dibuat Pada')
+                    ->label('Dibuat')
                     ->dateTime('d M Y, H:i')
                     ->sortable()
-                    ->toggleable(),
+                    ->toggleable(isToggledHiddenByDefault: true),
+
                 Tables\Columns\TextColumn::make('updated_at')
-                    ->label('Diperbarui Pada')
+                    ->label('Diperbarui')
                     ->dateTime('d M Y, H:i')
                     ->sortable()
-                    ->toggleable(),
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('company_id')
                     ->label('Perusahaan')
                     ->relationship('company', 'name')
                     ->preload()
-                    ->searchable()
+                    ->searchable(),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

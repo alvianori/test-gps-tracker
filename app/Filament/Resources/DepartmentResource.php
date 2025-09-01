@@ -30,69 +30,84 @@ class DepartmentResource extends Resource
                     ->description('Masukkan informasi detail departemen')
                     ->icon('heroicon-o-academic-cap')
                     ->schema([
-                        Forms\Components\TextInput::make('name')
-                            ->label('Nama Departemen')
-                            ->required()
-                            ->maxLength(255)
-                            ->placeholder('Masukkan nama departemen')
-                            ->unique(ignoreRecord: true),
+                        Forms\Components\Grid::make(2)->schema([
+                            Forms\Components\TextInput::make('name')
+                                ->label('Nama Departemen')
+                                ->required()
+                                ->maxLength(255)
+                                ->placeholder('Contoh: Human Resource, Finance, IT Support')
+                                ->unique(ignoreRecord: true)
+                                ->prefixIcon('heroicon-o-academic-cap')
+                                ->helperText('Nama departemen harus unik dalam perusahaan.'),
+                            
+                            Forms\Components\Select::make('company_id')
+                                ->label('Perusahaan')
+                                ->relationship('company', 'name')
+                                ->required()
+                                ->searchable()
+                                ->preload()
+                                ->placeholder('Pilih perusahaan')
+                                ->prefixIcon('heroicon-o-building-office'),
+                        ]),
+    
                         Forms\Components\Textarea::make('description')
                             ->label('Deskripsi')
                             ->maxLength(1000)
-                            ->placeholder('Masukkan deskripsi departemen')
+                            ->placeholder('Masukkan deskripsi singkat mengenai fungsi departemen ini')
+                            ->rows(3)
                             ->columnSpanFull(),
-                        Forms\Components\Select::make('company_id')
-                            ->label('Perusahaan')
-                            ->relationship('company', 'name')
-                            ->required()
-                            ->searchable()
-                            ->preload()
-                            ->placeholder('Pilih perusahaan'),
                     ]),
             ]);
     }
+    
 
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('rowIndex')
+                    ->label('No')
+                    ->rowIndex()
+                    ->sortable(false),
+    
                 Tables\Columns\TextColumn::make('name')
                     ->label('Nama Departemen')
                     ->searchable()
                     ->sortable()
                     ->icon('heroicon-o-academic-cap')
+                    ->weight('bold')
                     ->copyable(),
+    
                 Tables\Columns\TextColumn::make('description')
                     ->label('Deskripsi')
                     ->limit(50)
-                    ->tooltip(function (Tables\Columns\TextColumn $column): ?string {
-                        $state = $column->getState();
-                        
-                        if (strlen($state) <= 50) {
-                            return null;
-                        }
-                        
-                        return $state;
-                    }),
+                    ->tooltip(fn ($record) => $record->description),
+    
                 Tables\Columns\TextColumn::make('company.name')
                     ->label('Perusahaan')
                     ->searchable()
                     ->sortable()
                     ->badge()
                     ->color('success'),
+    
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Dibuat Pada')
                     ->dateTime('d M Y, H:i')
                     ->sortable()
-                    ->toggleable(),
+                    ->toggleable(isToggledHiddenByDefault: true),
+    
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label('Diperbarui Pada')
                     ->dateTime('d M Y, H:i')
                     ->sortable()
-                    ->toggleable(),
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                // contoh filter by perusahaan
+                Tables\Filters\SelectFilter::make('company_id')
+                    ->label('Filter Perusahaan')
+                    ->relationship('company', 'name')
+                    ->searchable(),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -104,6 +119,7 @@ class DepartmentResource extends Resource
                 ]),
             ]);
     }
+    
     
     public static function getRelations(): array
     {

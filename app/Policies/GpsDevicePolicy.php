@@ -23,18 +23,7 @@ class GpsDevicePolicy
      */
     public function view(User $user, GpsDevice $gpsDevice): bool
     {
-        // Jika user memiliki permission view_gps::device
-        if ($user->can('view_gps::device')) {
-            // Super admin dapat melihat semua data
-            if ($user->hasRole('super_admin')) {
-                return true;
-            }
-            
-            // User lain hanya dapat melihat data dari company mereka sendiri
-            return $user->company_id === $gpsDevice->company_id;
-        }
-        
-        return false;
+        return $user->can('view_gps::device');
     }
 
     /**
@@ -50,18 +39,7 @@ class GpsDevicePolicy
      */
     public function update(User $user, GpsDevice $gpsDevice): bool
     {
-        // Jika user memiliki permission update_gps::device
-        if ($user->can('update_gps::device')) {
-            // Super admin dapat mengupdate semua data
-            if ($user->hasRole('super_admin')) {
-                return true;
-            }
-            
-            // User lain hanya dapat mengupdate data dari company mereka sendiri
-            return $user->company_id === $gpsDevice->company_id;
-        }
-        
-        return false;
+        return $user->can('update_gps::device');
     }
 
     /**
@@ -69,18 +47,7 @@ class GpsDevicePolicy
      */
     public function delete(User $user, GpsDevice $gpsDevice): bool
     {
-        // Jika user memiliki permission delete_gps::device
-        if ($user->can('delete_gps::device')) {
-            // Super admin dapat menghapus semua data
-            if ($user->hasRole('super_admin')) {
-                return true;
-            }
-            
-            // User lain hanya dapat menghapus data dari company mereka sendiri
-            return $user->company_id === $gpsDevice->company_id;
-        }
-        
-        return false;
+        return $user->can('delete_gps::device');
     }
 
     /**
@@ -96,7 +63,7 @@ class GpsDevicePolicy
      */
     public function forceDelete(User $user, GpsDevice $gpsDevice): bool
     {
-        return $user->can('{{ ForceDelete }}');
+        return $user->can('force_delete_gps::device');
     }
 
     /**
@@ -104,7 +71,7 @@ class GpsDevicePolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('{{ ForceDeleteAny }}');
+        return $user->can('force_delete_any_gps::device');
     }
 
     /**
@@ -112,7 +79,7 @@ class GpsDevicePolicy
      */
     public function restore(User $user, GpsDevice $gpsDevice): bool
     {
-        return $user->can('{{ Restore }}');
+        return $user->can('restore_gps::device');
     }
 
     /**
@@ -120,7 +87,7 @@ class GpsDevicePolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('{{ RestoreAny }}');
+        return $user->can('restore_any_gps::device');
     }
 
     /**
@@ -128,7 +95,7 @@ class GpsDevicePolicy
      */
     public function replicate(User $user, GpsDevice $gpsDevice): bool
     {
-        return $user->can('{{ Replicate }}');
+        return $user->can('replicate_gps::device');
     }
 
     /**
@@ -136,6 +103,6 @@ class GpsDevicePolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('{{ Reorder }}');
+        return $user->can('reorder_gps::device');
     }
 }

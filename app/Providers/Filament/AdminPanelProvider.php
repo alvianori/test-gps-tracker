@@ -28,9 +28,13 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
+            ->brandName('GPS Tracker')
             ->login(Login::class)
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => '#2563eb', // biru
+                'success' => '#16a34a', // hijau
+                'danger' => '#dc2626',  // merah
+                'warning' => '#f59e0b', // kuning
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
