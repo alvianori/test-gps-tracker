@@ -10,6 +10,8 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Infolists\Infolist;
+use Filament\Infolists\Components;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
@@ -166,11 +168,75 @@ class CompanyResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                Tables\Actions\DeleteAction::make(),
+            ]);
+            // ->bulkActions([
+            //     Tables\Actions\BulkActionGroup::make([
+            //         Tables\Actions\DeleteBulkAction::make(),
+            //     ]),
+            // ]);
+    }
+
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+                Components\Section::make('Informasi Perusahaan')
+                    ->schema([
+                        Components\TextEntry::make('name')
+                            ->label('Nama Perusahaan')
+                            ->icon('heroicon-o-building-office-2')
+                            ->weight('bold'),
+
+                        Components\TextEntry::make('slug')
+                            ->label('Slug')
+                            ->copyable(),
+
+                        Components\TextEntry::make('businessType.name')
+                            ->label('Jenis Bisnis')
+                            ->badge()
+                            ->color('success'),
+                    ])
+                    ->columns(2),
+
+                Components\Section::make('Kontak')
+                    ->schema([
+                        Components\TextEntry::make('email')
+                            ->label('Email')
+                            ->icon('heroicon-o-envelope')
+                            ->copyable(),
+
+                        Components\TextEntry::make('phone')
+                            ->label('Nomor Telepon')
+                            ->icon('heroicon-o-phone')
+                            ->copyable(),
+                    ])
+                    ->columns(2),
+
+                Components\Section::make('Alamat & NPWP')
+                    ->schema([
+                        Components\TextEntry::make('address')
+                            ->label('Alamat')
+                            ->icon('heroicon-o-map-pin'),
+
+                        Components\TextEntry::make('npwp')
+                            ->label('NPWP')
+                            ->icon('heroicon-o-document-text')
+                            ->copyable(),
+                    ])
+                    ->columns(2),
+
+                Components\Section::make('Informasi Waktu')
+                    ->schema([
+                        Components\TextEntry::make('created_at')
+                            ->label('Dibuat Pada')
+                            ->dateTime('d M Y, H:i'),
+
+                        Components\TextEntry::make('updated_at')
+                            ->label('Diperbarui Pada')
+                            ->dateTime('d M Y, H:i'),
+                    ])
+                    ->columns(2),
             ]);
     }
     

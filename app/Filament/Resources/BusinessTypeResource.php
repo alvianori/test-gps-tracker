@@ -3,24 +3,21 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\BusinessTypeResource\Pages;
-use App\Filament\Resources\BusinessTypeResource\RelationManagers;
 use App\Models\BusinessType;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Infolists\Infolist;
+use Filament\Infolists\Components;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class BusinessTypeResource extends Resource
 {
     protected static ?string $model = BusinessType::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-building-office';
-    
     protected static ?string $navigationGroup = 'Master Data';
-    
     protected static ?int $navigationSort = 3;
 
     public static function form(Form $form): Form
@@ -85,21 +82,42 @@ class BusinessTypeResource extends Resource
             ])
             ->filters([])
             ->actions([
+                Tables\Actions\ViewAction::make(), // Tambahin view biar bisa pakai infolist
                 Tables\Actions\EditAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                Tables\Actions\DeleteAction::make(),
             ]);
     }
-    
+
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+                Components\Section::make('Detail Kategori Armada')
+                    ->schema([
+                        Components\TextEntry::make('name')
+                            ->label('Nama Kategori Armada')
+                            ->icon('heroicon-o-truck')
+                            ->badge(),
+
+                        Components\TextEntry::make('description')
+                            ->label('Deskripsi')
+                            ->placeholder('Tidak ada deskripsi'),
+
+                        Components\TextEntry::make('created_at')
+                            ->label('Dibuat Pada')
+                            ->dateTime('d M Y, H:i'),
+
+                        Components\TextEntry::make('updated_at')
+                            ->label('Diperbarui Pada')
+                            ->dateTime('d M Y, H:i'),
+                    ])
+                    ->columns(2),
+            ]);
+    }
 
     public static function getRelations(): array
     {
-        return [
-            //
-        ];
+        return [];
     }
 
     public static function getPages(): array
@@ -108,6 +126,7 @@ class BusinessTypeResource extends Resource
             'index' => Pages\ListBusinessTypes::route('/'),
             'create' => Pages\CreateBusinessType::route('/create'),
             'edit' => Pages\EditBusinessType::route('/{record}/edit'),
+            'view' => Pages\ViewBusinessType::route('/{record}'), // Tambahin view page
         ];
     }
 }

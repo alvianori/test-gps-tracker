@@ -8,7 +8,7 @@ enum TaskStatus: string
 {
     use IsKanbanStatus;
 
-    case Todo = 'todo';
-    case Doing = 'in_progress';
-    case Done = 'done';
+    case Todo = 'todo';          // Rute dijadwalkan
+    case InProgress = 'in_progress'; // Armada sedang berjalan
+    case Done = 'done';          // Rute selesai
 }

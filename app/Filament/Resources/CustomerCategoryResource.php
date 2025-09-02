@@ -8,8 +8,11 @@ use App\Models\CustomerCategory;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Forms\Components\Section;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Infolists\Infolist;
+use Filament\Infolists\Components;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
@@ -114,16 +117,48 @@ class CustomerCategoryResource extends Resource
                     ->searchable(),
             ])
             ->actions([
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
             ]);
+            // ->bulkActions([
+            //     Tables\Actions\BulkActionGroup::make([
+            //         Tables\Actions\DeleteBulkAction::make(),
+            //     ]),
+            // ]);
     }
     
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+                Section::make('Detail Kategori Pelanggan')
+                    ->schema([
+                        TextEntry::make('name')
+                            ->label('Nama Kategori')
+                            ->icon('heroicon-o-tag')
+                            ->badge(),
+
+                        TextEntry::make('description')
+                            ->label('Deskripsi')
+                            ->placeholder('Tidak ada deskripsi'),
+
+                        TextEntry::make('company.name')
+                            ->label('Perusahaan')
+                            ->badge()
+                            ->color('success'),
+
+                        TextEntry::make('created_at')
+                            ->label('Dibuat')
+                            ->dateTime('d M Y, H:i'),
+
+                        TextEntry::make('updated_at')
+                            ->label('Diperbarui')
+                            ->dateTime('d M Y, H:i'),
+                    ])
+                    ->columns(2),
+            ]);
+    }
 
     public static function getRelations(): array
     {

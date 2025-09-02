@@ -182,21 +182,21 @@ class FleetGpsResource extends Resource
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkAction::make('activate')
-                    ->label('Aktifkan')
-                    ->icon('heroicon-o-check-circle')
-                    ->color('success')
-                    ->action(fn ($records) => $records->each->update(['active' => true])),
+            // ->bulkActions([
+            //     Tables\Actions\BulkAction::make('activate')
+            //         ->label('Aktifkan')
+            //         ->icon('heroicon-o-check-circle')
+            //         ->color('success')
+            //         ->action(fn ($records) => $records->each->update(['active' => true])),
 
-                Tables\Actions\BulkAction::make('deactivate')
-                    ->label('Nonaktifkan')
-                    ->icon('heroicon-o-x-circle')
-                    ->color('danger')
-                    ->action(fn ($records) => $records->each->update(['active' => false])),
+            //     Tables\Actions\BulkAction::make('deactivate')
+            //         ->label('Nonaktifkan')
+            //         ->icon('heroicon-o-x-circle')
+            //         ->color('danger')
+            //         ->action(fn ($records) => $records->each->update(['active' => false])),
 
-                Tables\Actions\DeleteBulkAction::make(),
-            ])
+            //     Tables\Actions\DeleteBulkAction::make(),
+            // ])
             ->defaultSort('created_at', 'desc');
     }
 

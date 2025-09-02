@@ -167,22 +167,22 @@ class FleetUserResource extends Resource
                     ->color('danger')
                     ->visible(fn (FleetUser $record) => $record->active)
                     ->action(fn (FleetUser $record) => $record->deactivate()),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\BulkAction::make('activate')
-                        ->label('Aktifkan')
-                        ->icon('heroicon-o-check-circle')
-                        ->color('success')
-                        ->action(fn ($records) => $records->each->activate()),
-                    Tables\Actions\BulkAction::make('deactivate')
-                        ->label('Nonaktifkan')
-                        ->icon('heroicon-o-x-circle')
-                        ->color('danger')
-                        ->action(fn ($records) => $records->each->deactivate()),
-                ]),
             ]);
+            // ->bulkActions([
+            //     Tables\Actions\BulkActionGroup::make([
+            //         Tables\Actions\DeleteBulkAction::make(),
+            //         Tables\Actions\BulkAction::make('activate')
+            //             ->label('Aktifkan')
+            //             ->icon('heroicon-o-check-circle')
+            //             ->color('success')
+            //             ->action(fn ($records) => $records->each->activate()),
+            //         Tables\Actions\BulkAction::make('deactivate')
+            //             ->label('Nonaktifkan')
+            //             ->icon('heroicon-o-x-circle')
+            //             ->color('danger')
+            //             ->action(fn ($records) => $records->each->deactivate()),
+            //     ]),
+            // ]);
     }
 
     public static function getRelations(): array
