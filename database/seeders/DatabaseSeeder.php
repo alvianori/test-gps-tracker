@@ -24,6 +24,9 @@ class DatabaseSeeder extends Seeder
             CustomerSeeder::class,
             GpsDeviceSeeder::class,
             GpsTrackSeeder::class,
+            FeatureSeeder::class,
+            ServicePackageSeeder::class,
+            TaskSeeder::class,
         ]);
     }
 }

@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Company extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
     protected $fillable = [
         'name',
         'slug',
@@ -17,6 +18,7 @@ class Company extends Model
         'address',
         'phone',
         'npwp',
+        'service_package_id',
     ];
     
     public function setPhoneAttribute($value)
@@ -67,5 +69,10 @@ class Company extends Model
     public function fleets()
     {
         return $this->hasMany(Fleet::class);
+    }
+
+    public function servicePackage()
+    {
+        return $this->belongsTo(ServicePackage::class);
     }
 }
