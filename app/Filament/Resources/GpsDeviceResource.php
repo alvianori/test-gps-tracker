@@ -9,6 +9,8 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Infolists\Infolist;
+use Filament\Infolists\Components;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
@@ -123,6 +125,7 @@ class GpsDeviceResource extends Resource
                     ->searchable(),
             ])
             ->actions([
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ]);
@@ -131,6 +134,45 @@ class GpsDeviceResource extends Resource
             //         Tables\Actions\DeleteBulkAction::make(),
             //     ]),
             // ]);
+    }
+
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+                Components\Section::make('Detail Perangkat GPS')
+                    ->schema([
+                        Components\TextEntry::make('name')
+                            ->label('Nama Perangkat')
+                            ->icon('heroicon-o-device-phone-mobile')
+                            ->badge(),
+
+                        Components\TextEntry::make('code')
+                            ->label('Kode Perangkat')
+                            ->copyable()
+                            ->color('info'),
+
+                        Components\TextEntry::make('provider')
+                            ->label('Nomor Telepon Provider')
+                            ->icon('heroicon-o-phone')
+                            ->badge()
+                            ->color('success'),
+
+                        Components\TextEntry::make('company.name')
+                            ->label('Perusahaan')
+                            ->badge()
+                            ->color('warning'),
+
+                        Components\TextEntry::make('created_at')
+                            ->label('Dibuat')
+                            ->dateTime('d M Y, H:i'),
+
+                        Components\TextEntry::make('updated_at')
+                            ->label('Diperbarui')
+                            ->dateTime('d M Y, H:i'),
+                    ])
+                    ->columns(2),
+            ]);
     }
     
     public static function getRelations(): array
@@ -145,6 +187,7 @@ class GpsDeviceResource extends Resource
         return [
             'index' => Pages\ListGpsDevices::route('/'),
             'create' => Pages\CreateGpsDevice::route('/create'),
+            'view' => Pages\ViewGpsDevice::route('/{record}'),
             'edit' => Pages\EditGpsDevice::route('/{record}/edit'),
         ];
     }

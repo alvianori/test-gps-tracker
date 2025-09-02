@@ -10,6 +10,8 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Infolists\Infolist;
+use Filament\Infolists\Components;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
@@ -155,6 +157,7 @@ class FleetResource extends Resource
                     ->searchable(),
             ])
             ->actions([
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ]);
@@ -163,6 +166,48 @@ class FleetResource extends Resource
             //         Tables\Actions\DeleteBulkAction::make(),
             //     ]),
             // ]);
+    }
+
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+                \Filament\Infolists\Components\Section::make('Detail Kendaraan')
+                    ->icon('heroicon-o-truck')
+                    ->schema([
+                        \Filament\Infolists\Components\TextEntry::make('name')
+                            ->label('Nama Kendaraan')
+                            ->icon('heroicon-o-truck')
+                            ->weight('bold'),
+
+                        \Filament\Infolists\Components\TextEntry::make('plate_number')
+                            ->label('Nomor Plat')
+                            ->icon('heroicon-o-identification')
+                            ->copyable(),
+
+                        \Filament\Infolists\Components\TextEntry::make('machine_number')
+                            ->label('Nomor Mesin')
+                            ->icon('heroicon-o-cog')
+                            ->copyable(),
+
+                        \Filament\Infolists\Components\TextEntry::make('category.name')
+                            ->label('Kategori Kendaraan')
+                            ->badge()
+                            ->color('primary'),
+
+                        \Filament\Infolists\Components\TextEntry::make('company.name')
+                            ->label('Perusahaan'),
+
+                        \Filament\Infolists\Components\TextEntry::make('created_at')
+                            ->label('Dibuat')
+                            ->dateTime('d M Y, H:i'),
+
+                        \Filament\Infolists\Components\TextEntry::make('updated_at')
+                            ->label('Diperbarui')
+                            ->dateTime('d M Y, H:i'),
+                    ])
+                    ->columns(2),
+            ]);
     }
 
     public static function getRelations(): array

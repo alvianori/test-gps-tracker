@@ -9,6 +9,8 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Infolists\Infolist;
+use Filament\Infolists\Components;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
@@ -109,6 +111,7 @@ class PositionResource extends Resource
                     ->searchable(),
             ])
             ->actions([
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ]);
@@ -119,6 +122,45 @@ class PositionResource extends Resource
             // ]);
     }
     
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+                Components\Section::make('Informasi Jabatan')
+                    ->schema([
+                        Components\TextEntry::make('name')
+                            ->label('Nama Jabatan')
+                            ->icon('heroicon-o-briefcase')
+                            ->weight('bold'),
+
+                        Components\TextEntry::make('company.name')
+                            ->label('Perusahaan')
+                            ->badge()
+                            ->color('success'),
+                    ])
+                    ->columns(2),
+
+                Components\Section::make('Deskripsi')
+                    ->schema([
+                        Components\TextEntry::make('description')
+                            ->label('Deskripsi')
+                            ->placeholder('-'),
+                    ])
+                    ->columnSpanFull(),
+
+                Components\Section::make('Informasi Waktu')
+                    ->schema([
+                        Components\TextEntry::make('created_at')
+                            ->label('Dibuat Pada')
+                            ->dateTime('d M Y, H:i'),
+
+                        Components\TextEntry::make('updated_at')
+                            ->label('Diperbarui Pada')
+                            ->dateTime('d M Y, H:i'),
+                    ])
+                    ->columns(2),
+            ]);
+    }
     
     public static function getRelations(): array
     {
@@ -132,6 +174,7 @@ class PositionResource extends Resource
         return [
             'index' => Pages\ListPositions::route('/'),
             'create' => Pages\CreatePosition::route('/create'),
+            'view' => Pages\ViewPosition::route('/{record}'),
             'edit' => Pages\EditPosition::route('/{record}/edit'),
         ];
     }

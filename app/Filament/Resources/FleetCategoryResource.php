@@ -10,6 +10,8 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Infolists\Infolist;
+use Filament\Infolists\Components;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
@@ -115,6 +117,7 @@ class FleetCategoryResource extends Resource
                     ->searchable(),
             ])
             ->actions([
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ]);
@@ -125,6 +128,38 @@ class FleetCategoryResource extends Resource
             // ]);
     }
     
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+                Components\Section::make('Detail Kategori Kendaraan')
+                    ->schema([
+                        Components\TextEntry::make('name')
+                            ->label('Nama Kategori')
+                            ->icon('heroicon-o-tag')
+                            ->badge(),
+    
+                        Components\TextEntry::make('description')
+                            ->label('Deskripsi')
+                            ->placeholder('Tidak ada deskripsi')
+                            ->columnSpanFull(),
+    
+                        Components\TextEntry::make('company.name')
+                            ->label('Perusahaan')
+                            ->badge()
+                            ->color('info'),
+    
+                        Components\TextEntry::make('created_at')
+                            ->label('Dibuat')
+                            ->dateTime('d M Y, H:i'),
+    
+                        Components\TextEntry::make('updated_at')
+                            ->label('Diperbarui')
+                            ->dateTime('d M Y, H:i'),
+                    ])
+                    ->columns(2),
+            ]);
+    }
 
     public static function getRelations(): array
     {
@@ -138,6 +173,7 @@ class FleetCategoryResource extends Resource
         return [
             'index' => Pages\ListFleetCategories::route('/'),
             'create' => Pages\CreateFleetCategory::route('/create'),
+            'view' => Pages\ViewFleetCategory::route('/{record}'),
             'edit' => Pages\EditFleetCategory::route('/{record}/edit'),
         ];
     }

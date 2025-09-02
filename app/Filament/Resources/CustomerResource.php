@@ -10,6 +10,8 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Infolists\Infolist;
+use Filament\Infolists\Components;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
@@ -147,13 +149,58 @@ class CustomerResource extends Resource
             ])
             ->filters([])
             ->actions([
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ]);
             // ->bulkActions([
             //     Tables\Actions\BulkActionGroup::make([
             //         Tables\Actions\DeleteBulkAction::make(),
             //     ]),
             // ]);
+    }
+
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+                Components\Section::make('Detail Pelanggan')
+                    ->schema([
+                        Components\TextEntry::make('name')
+                            ->label('Nama')
+                            ->icon('heroicon-o-user')
+                            ->badge(),
+
+                        Components\TextEntry::make('email')
+                            ->label('Email')
+                            ->icon('heroicon-o-envelope')
+                            ->copyable(),
+
+                        Components\TextEntry::make('phone')
+                            ->label('Telepon')
+                            ->icon('heroicon-o-phone')
+                            ->copyable(),
+
+                        Components\TextEntry::make('category.name')
+                            ->label('Kategori')
+                            ->badge()
+                            ->color('success'),
+
+                        Components\TextEntry::make('address')
+                            ->label('Alamat')
+                            ->placeholder('Tidak ada alamat')
+                            ->columnSpanFull(),
+
+                        Components\TextEntry::make('created_at')
+                            ->label('Dibuat')
+                            ->dateTime('d M Y, H:i'),
+
+                        Components\TextEntry::make('updated_at')
+                            ->label('Diperbarui')
+                            ->dateTime('d M Y, H:i'),
+                    ])
+                    ->columns(2),
+            ]);
     }
 
     public static function getRelations(): array
@@ -168,6 +215,7 @@ class CustomerResource extends Resource
         return [
             'index' => Pages\ListCustomers::route('/'),
             'create' => Pages\CreateCustomer::route('/create'),
+            'view' => Pages\ViewCustomer::route('/{record}'),
             'edit' => Pages\EditCustomer::route('/{record}/edit'),
         ];
     }

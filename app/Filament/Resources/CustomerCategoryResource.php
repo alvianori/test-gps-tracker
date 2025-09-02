@@ -132,33 +132,34 @@ class CustomerCategoryResource extends Resource
     {
         return $infolist
             ->schema([
-                Section::make('Detail Kategori Pelanggan')
+                Components\Section::make('Detail Kategori Pelanggan')
                     ->schema([
-                        TextEntry::make('name')
+                        Components\TextEntry::make('name')
                             ->label('Nama Kategori')
                             ->icon('heroicon-o-tag')
                             ->badge(),
 
-                        TextEntry::make('description')
+                        Components\TextEntry::make('description')
                             ->label('Deskripsi')
                             ->placeholder('Tidak ada deskripsi'),
 
-                        TextEntry::make('company.name')
+                        Components\TextEntry::make('company.name')
                             ->label('Perusahaan')
                             ->badge()
                             ->color('success'),
 
-                        TextEntry::make('created_at')
+                        Components\TextEntry::make('created_at')
                             ->label('Dibuat')
                             ->dateTime('d M Y, H:i'),
 
-                        TextEntry::make('updated_at')
+                        Components\TextEntry::make('updated_at')
                             ->label('Diperbarui')
                             ->dateTime('d M Y, H:i'),
                     ])
                     ->columns(2),
             ]);
     }
+
 
     public static function getRelations(): array
     {
@@ -172,6 +173,7 @@ class CustomerCategoryResource extends Resource
         return [
             'index' => Pages\ListCustomerCategories::route('/'),
             'create' => Pages\CreateCustomerCategory::route('/create'),
+            'view' => Pages\ViewCustomerCategory::route('/{record}'),
             'edit' => Pages\EditCustomerCategory::route('/{record}/edit'),
         ];
     }

@@ -9,6 +9,8 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Infolists\Infolist;
+use Filament\Infolists\Components;
 use Illuminate\Database\Eloquent\Builder;
 
 class FleetGpsResource extends Resource
@@ -179,6 +181,7 @@ class FleetGpsResource extends Resource
                     ->visible(fn (FleetGps $record) => $record->active)
                     ->action(fn (FleetGps $record) => $record->deactivate()),
 
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])
@@ -200,6 +203,50 @@ class FleetGpsResource extends Resource
             ->defaultSort('created_at', 'desc');
     }
 
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+                Components\Section::make('Detail Penugasan GPS')
+                    ->schema([
+                        Components\TextEntry::make('fleet.name')
+                            ->label('Kendaraan')
+                            ->icon('heroicon-o-truck')
+                            ->badge(),
+
+                        Components\TextEntry::make('fleet.plate_number')
+                            ->label('Nomor Plat')
+                            ->copyable(),
+
+                        Components\TextEntry::make('gpsDevice.name')
+                            ->label('Perangkat GPS')
+                            ->icon('heroicon-o-cpu-chip')
+                            ->badge()
+                            ->color('info'),
+
+                        Components\TextEntry::make('gpsDevice.serial_number')
+                            ->label('Nomor Seri')
+                            ->copyable(),
+
+                        Components\TextEntry::make('active')
+                            ->label('Status')
+                            ->badge()
+                            ->formatStateUsing(fn ($state) => $state ? 'Aktif' : 'Nonaktif')
+                            ->color(fn ($state) => $state ? 'success' : 'danger'),
+
+                        Components\TextEntry::make('assigned_at')
+                            ->label('Tanggal Mulai Penugasan')
+                            ->dateTime('d M Y H:i'),
+
+                        Components\TextEntry::make('unassigned_at')
+                            ->label('Tanggal Selesai Penugasan')
+                            ->dateTime('d M Y H:i')
+                            ->placeholder('-'),
+                    ])
+                    ->columns(2),
+            ]);
+    }
+
     public static function getRelations(): array
     {
         return [];
@@ -210,6 +257,7 @@ class FleetGpsResource extends Resource
         return [
             'index' => Pages\ListFleetGps::route('/'),
             'create' => Pages\CreateFleetGps::route('/create'),
+            'view' => Pages\ViewFleetGps::route('/{record}'), 
             'edit' => Pages\EditFleetGps::route('/{record}/edit'),
         ];
     }
