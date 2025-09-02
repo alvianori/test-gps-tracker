@@ -8,7 +8,16 @@ enum TaskStatus: string
 {
     use IsKanbanStatus;
 
-    case Todo = 'todo';          // Rute dijadwalkan
-    case InProgress = 'in_progress'; // Armada sedang berjalan
-    case Done = 'done';          // Rute selesai
+    case Todo = 'todo';
+    case InProgress = 'in_progress';
+    case Done = 'done';
+
+    public function label(): string
+    {
+        return match ($this) {
+            self::Todo => 'To Do',
+            self::InProgress => 'In Progress',
+            self::Done => 'Done',
+        };
+    }
 }

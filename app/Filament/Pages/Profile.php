@@ -18,7 +18,7 @@ class Profile extends Page
     protected static ?string $title = 'My Profile';
     protected static ?string $navigationGroup = 'Pengaturan';
 
-    protected static string $view = 'filament.pages.profile';
+    protected static string $view = 'vendor.filament.pages.profile';
 
     public $name;
     public $email;
