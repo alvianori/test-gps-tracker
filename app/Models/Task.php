@@ -3,13 +3,21 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Enums\TaskStatus;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Task extends Model
 {
-    protected $fillable = ['title', 'status'];
+    use HasFactory;
 
-    protected $casts = [
-        'status' => TaskStatus::class,
+    protected $fillable = [
+        'title',
+        'description',
+        'status',
+        'user_id',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

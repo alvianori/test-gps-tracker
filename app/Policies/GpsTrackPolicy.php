@@ -2,10 +2,9 @@
 
 namespace App\Policies;
 
-use App\Models\GpsTrack;
 use App\Models\User;
+use App\Models\GpsTrack;
 use Illuminate\Auth\Access\HandlesAuthorization;
-use Illuminate\Support\Facades\DB;
 
 class GpsTrackPolicy
 {
@@ -24,22 +23,7 @@ class GpsTrackPolicy
      */
     public function view(User $user, GpsTrack $gpsTrack): bool
     {
-        // Jika user memiliki permission view_gps::track
-        if ($user->can('view_gps::track')) {
-            // Super admin dapat melihat semua data
-            if ($user->hasRole('super_admin')) {
-                return true;
-            }
-            
-            // Cek apakah GPS device milik company user
-            $deviceCompanyId = DB::table('gps_devices')
-                ->where('id', $gpsTrack->gps_device_id)
-                ->value('company_id');
-                
-            return $user->company_id === $deviceCompanyId;
-        }
-        
-        return false;
+        return $user->can('view_gps::track');
     }
 
     /**
@@ -55,22 +39,7 @@ class GpsTrackPolicy
      */
     public function update(User $user, GpsTrack $gpsTrack): bool
     {
-        // Jika user memiliki permission update_gps::track
-        if ($user->can('update_gps::track')) {
-            // Super admin dapat mengupdate semua data
-            if ($user->hasRole('super_admin')) {
-                return true;
-            }
-            
-            // Cek apakah GPS device milik company user
-            $deviceCompanyId = DB::table('gps_devices')
-                ->where('id', $gpsTrack->gps_device_id)
-                ->value('company_id');
-                
-            return $user->company_id === $deviceCompanyId;
-        }
-        
-        return false;
+        return $user->can('update_gps::track');
     }
 
     /**
@@ -78,22 +47,7 @@ class GpsTrackPolicy
      */
     public function delete(User $user, GpsTrack $gpsTrack): bool
     {
-        // Jika user memiliki permission delete_gps::track
-        if ($user->can('delete_gps::track')) {
-            // Super admin dapat menghapus semua data
-            if ($user->hasRole('super_admin')) {
-                return true;
-            }
-            
-            // Cek apakah GPS device milik company user
-            $deviceCompanyId = DB::table('gps_devices')
-                ->where('id', $gpsTrack->gps_device_id)
-                ->value('company_id');
-                
-            return $user->company_id === $deviceCompanyId;
-        }
-        
-        return false;
+        return $user->can('delete_gps::track');
     }
 
     /**
@@ -102,5 +56,53 @@ class GpsTrackPolicy
     public function deleteAny(User $user): bool
     {
         return $user->can('delete_any_gps::track');
+    }
+
+    /**
+     * Determine whether the user can permanently delete.
+     */
+    public function forceDelete(User $user, GpsTrack $gpsTrack): bool
+    {
+        return $user->can('force_delete_gps::track');
+    }
+
+    /**
+     * Determine whether the user can permanently bulk delete.
+     */
+    public function forceDeleteAny(User $user): bool
+    {
+        return $user->can('force_delete_any_gps::track');
+    }
+
+    /**
+     * Determine whether the user can restore.
+     */
+    public function restore(User $user, GpsTrack $gpsTrack): bool
+    {
+        return $user->can('restore_gps::track');
+    }
+
+    /**
+     * Determine whether the user can bulk restore.
+     */
+    public function restoreAny(User $user): bool
+    {
+        return $user->can('restore_any_gps::track');
+    }
+
+    /**
+     * Determine whether the user can replicate.
+     */
+    public function replicate(User $user, GpsTrack $gpsTrack): bool
+    {
+        return $user->can('replicate_gps::track');
+    }
+
+    /**
+     * Determine whether the user can reorder.
+     */
+    public function reorder(User $user): bool
+    {
+        return $user->can('reorder_gps::track');
     }
 }
