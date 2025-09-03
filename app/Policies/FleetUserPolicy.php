@@ -2,8 +2,8 @@
 
 namespace App\Policies;
 
-use App\Models\FleetUser;
 use App\Models\User;
+use App\Models\FleetUser;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class FleetUserPolicy
@@ -12,83 +12,97 @@ class FleetUserPolicy
 
     /**
      * Determine whether the user can view any models.
-     *
-     * @param  \App\Models\User  $user
-     * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function viewAny(User $user)
+    public function viewAny(User $user): bool
     {
-        return $user->hasRole('super_admin') || $user->hasPermissionTo('fleet_user.view');
+        return $user->can('view_any_fleet::user');
     }
 
     /**
      * Determine whether the user can view the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\FleetUser  $fleetUser
-     * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function view(User $user, FleetUser $fleetUser)
+    public function view(User $user, FleetUser $fleetUser): bool
     {
-        if ($user->hasRole('super_admin')) {
-            return true;
-        }
-        
-        if ($user->hasPermissionTo('fleet_user.view')) {
-            return $user->company_id === $fleetUser->fleet->company_id;
-        }
-        
-        return false;
+        return $user->can('view_fleet::user');
     }
 
     /**
      * Determine whether the user can create models.
-     *
-     * @param  \App\Models\User  $user
-     * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function create(User $user)
+    public function create(User $user): bool
     {
-        return $user->hasRole('super_admin') || $user->hasPermissionTo('fleet_user.create');
+        return $user->can('create_fleet::user');
     }
 
     /**
      * Determine whether the user can update the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\FleetUser  $fleetUser
-     * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function update(User $user, FleetUser $fleetUser)
+    public function update(User $user, FleetUser $fleetUser): bool
     {
-        if ($user->hasRole('super_admin')) {
-            return true;
-        }
-        
-        if ($user->hasPermissionTo('fleet_user.update')) {
-            return $user->company_id === $fleetUser->fleet->company_id;
-        }
-        
-        return false;
+        return $user->can('update_fleet::user');
     }
 
     /**
      * Determine whether the user can delete the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\FleetUser  $fleetUser
-     * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function delete(User $user, FleetUser $fleetUser)
+    public function delete(User $user, FleetUser $fleetUser): bool
     {
-        if ($user->hasRole('super_admin')) {
-            return true;
-        }
-        
-        if ($user->hasPermissionTo('fleet_user.delete')) {
-            return $user->company_id === $fleetUser->fleet->company_id;
-        }
-        
-        return false;
+        return $user->can('delete_fleet::user');
+    }
+
+    /**
+     * Determine whether the user can bulk delete.
+     */
+    public function deleteAny(User $user): bool
+    {
+        return $user->can('delete_any_fleet::user');
+    }
+
+    /**
+     * Determine whether the user can permanently delete.
+     */
+    public function forceDelete(User $user, FleetUser $fleetUser): bool
+    {
+        return $user->can('force_delete_fleet::user');
+    }
+
+    /**
+     * Determine whether the user can permanently bulk delete.
+     */
+    public function forceDeleteAny(User $user): bool
+    {
+        return $user->can('force_delete_any_fleet::user');
+    }
+
+    /**
+     * Determine whether the user can restore.
+     */
+    public function restore(User $user, FleetUser $fleetUser): bool
+    {
+        return $user->can('restore_fleet::user');
+    }
+
+    /**
+     * Determine whether the user can bulk restore.
+     */
+    public function restoreAny(User $user): bool
+    {
+        return $user->can('restore_any_fleet::user');
+    }
+
+    /**
+     * Determine whether the user can replicate.
+     */
+    public function replicate(User $user, FleetUser $fleetUser): bool
+    {
+        return $user->can('replicate_fleet::user');
+    }
+
+    /**
+     * Determine whether the user can reorder.
+     */
+    public function reorder(User $user): bool
+    {
+        return $user->can('reorder_fleet::user');
     }
 }

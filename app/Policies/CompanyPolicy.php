@@ -23,18 +23,7 @@ class CompanyPolicy
      */
     public function view(User $user, Company $company): bool
     {
-        // Jika user memiliki permission view_company
-        if ($user->can('view_company')) {
-            // Super admin dapat melihat semua data
-            if ($user->hasRole('super_admin')) {
-                return true;
-            }
-            
-            // User lain hanya dapat melihat data dari company mereka sendiri
-            return $user->company_id === $company->id;
-        }
-        
-        return false;
+        return $user->can('view_company');
     }
 
     /**
@@ -50,18 +39,7 @@ class CompanyPolicy
      */
     public function update(User $user, Company $company): bool
     {
-        // Jika user memiliki permission update_company
-        if ($user->can('update_company')) {
-            // Super admin dapat mengupdate semua data
-            if ($user->hasRole('super_admin')) {
-                return true;
-            }
-            
-            // User lain hanya dapat mengupdate data dari company mereka sendiri
-            return $user->company_id === $company->id;
-        }
-        
-        return false;
+        return $user->can('update_company');
     }
 
     /**
@@ -69,18 +47,7 @@ class CompanyPolicy
      */
     public function delete(User $user, Company $company): bool
     {
-        // Jika user memiliki permission delete_company
-        if ($user->can('delete_company')) {
-            // Super admin dapat menghapus semua data
-            if ($user->hasRole('super_admin')) {
-                return true;
-            }
-            
-            // User lain hanya dapat menghapus data dari company mereka sendiri
-            return $user->company_id === $company->id;
-        }
-        
-        return false;
+        return $user->can('delete_company');
     }
 
     /**

@@ -1,0 +1,67 @@
+/* Branding Title di sidebar */
+.filament-sidebar-header {
+    font-size: 18px;
+    font-weight: bold;
+    color: #2563eb;
+}
+
+/* Menu aktif */
+.filament-sidebar-item-active {
+    background-color: rgba(37, 99, 235, 0.15);
+    border-radius: 8px;
+    color: #2563eb !important;
+    font-weight: bold;
+}
+
+/* Hover menu */
+.filament-sidebar-item:hover {
+    background-color: rgba(37, 99, 235, 0.08);
+}
+
+/* ===== Garis penghubung di sidebar ===== */
+
+/* Vertikal di kiri grup */
+.filament-sidebar-group ul {
+    position: relative;
+    padding-left: 20px !important;
+    margin: 0;
+    list-style: none;
+}
+
+.filament-sidebar-group ul::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 9px;
+    width: 2px;
+    background-color: rgba(37, 99, 235, 0.3);
+}
+
+/* Horizontal dari garis vertikal ke icon */
+.filament-sidebar-group ul li {
+    position: relative;
+    padding-left: 12px !important;
+}
+
+.filament-sidebar-group ul li::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: -11px;
+    width: 10px;
+    height: 2px;
+    background-color: rgba(37, 99, 235, 0.3);
+    transform: translateY(-50%);
+}
+
+/* Hapus sisa garis vertikal di item terakhir */
+.filament-sidebar-group ul li:last-child::after {
+    content: '';
+    position: absolute;
+    left: -11px;
+    bottom: 0;
+    width: 2px;
+    height: 50%;
+    background-color: white;
+}

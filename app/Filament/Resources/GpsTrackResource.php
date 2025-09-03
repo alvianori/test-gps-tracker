@@ -58,33 +58,42 @@ class GpsTrackResource extends Resource
                 Tables\Columns\TextColumn::make('gpsDevice.name')
                     ->label('Perangkat GPS')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->weight('bold'),
+
                 Tables\Columns\TextColumn::make('gpsDevice.company.name')
                     ->label('Perusahaan')
-                    ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->searchable(),
+
                 Tables\Columns\TextColumn::make('latitude')
                     ->label('Latitude')
-                    ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->copyable(),
+
                 Tables\Columns\TextColumn::make('longitude')
                     ->label('Longitude')
-                    ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->copyable(),
+
                 Tables\Columns\TextColumn::make('speed')
-                    ->label('Kecepatan')
+                    ->label('Kecepatan (km/jam)')
                     ->sortable(),
+
                 Tables\Columns\TextColumn::make('direction')
                     ->label('Arah')
                     ->sortable(),
+
                 Tables\Columns\TextColumn::make('devices_timestamp')
                     ->label('Waktu Perangkat')
                     ->dateTime('d M Y H:i:s')
                     ->sortable(),
+
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label('Dibuat Pada')
+                    ->label('Diterima Server')
                     ->dateTime('d M Y H:i:s')
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('gps_device_id')
@@ -97,27 +106,29 @@ class GpsTrackResource extends Resource
                     })
                     ->searchable()
                     ->preload(),
+
                 Tables\Filters\Filter::make('devices_timestamp')
                     ->form([
-                        Forms\Components\DatePicker::make('created_from')
+                        Forms\Components\DatePicker::make('from')
                             ->label('Dari Tanggal'),
-                        Forms\Components\DatePicker::make('created_until')
+                        Forms\Components\DatePicker::make('until')
                             ->label('Sampai Tanggal'),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query
                             ->when(
-                                $data['created_from'],
+                                $data['from'],
                                 fn (Builder $query, $date): Builder => $query->whereDate('devices_timestamp', '>=', $date),
                             )
                             ->when(
-                                $data['created_until'],
+                                $data['until'],
                                 fn (Builder $query, $date): Builder => $query->whereDate('devices_timestamp', '<=', $date),
                             );
-                    })
+                    }),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                Tables\Actions\ViewAction::make()
+                    ->label('Detail'),
             ])
             ->bulkActions([])
             ->defaultSort('devices_timestamp', 'desc');

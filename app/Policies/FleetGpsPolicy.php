@@ -2,8 +2,8 @@
 
 namespace App\Policies;
 
-use App\Models\FleetGps;
 use App\Models\User;
+use App\Models\FleetGps;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class FleetGpsPolicy
@@ -12,77 +12,97 @@ class FleetGpsPolicy
 
     /**
      * Determine whether the user can view any models.
-     *
-     * @param  \App\Models\User  $user
-     * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function viewAny(User $user)
+    public function viewAny(User $user): bool
     {
-        return $user->hasRole('super_admin') || $user->can('fleet_gps.view');
+        return $user->can('view_any_fleet::gps');
     }
 
     /**
      * Determine whether the user can view the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\FleetGps  $fleetGps
-     * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function view(User $user, FleetGps $fleetGps)
+    public function view(User $user, FleetGps $fleetGps): bool
     {
-        if ($user->hasRole('super_admin') || $user->can('fleet_gps.view')) {
-            if (!$user->hasRole('super_admin')) {
-                return $user->company_id === $fleetGps->fleet->company_id;
-            }
-            return true;
-        }
-        return false;
+        return $user->can('view_fleet::gps');
     }
 
     /**
      * Determine whether the user can create models.
-     *
-     * @param  \App\Models\User  $user
-     * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function create(User $user)
+    public function create(User $user): bool
     {
-        return $user->hasRole('super_admin') || $user->can('fleet_gps.create');
+        return $user->can('create_fleet::gps');
     }
 
     /**
      * Determine whether the user can update the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\FleetGps  $fleetGps
-     * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function update(User $user, FleetGps $fleetGps)
+    public function update(User $user, FleetGps $fleetGps): bool
     {
-        if ($user->hasRole('super_admin') || $user->can('fleet_gps.update')) {
-            if (!$user->hasRole('super_admin')) {
-                return $user->company_id === $fleetGps->fleet->company_id;
-            }
-            return true;
-        }
-        return false;
+        return $user->can('update_fleet::gps');
     }
 
     /**
      * Determine whether the user can delete the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\FleetGps  $fleetGps
-     * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function delete(User $user, FleetGps $fleetGps)
+    public function delete(User $user, FleetGps $fleetGps): bool
     {
-        if ($user->hasRole('super_admin') || $user->can('fleet_gps.delete')) {
-            if (!$user->hasRole('super_admin')) {
-                return $user->company_id === $fleetGps->fleet->company_id;
-            }
-            return true;
-        }
-        return false;
+        return $user->can('delete_fleet::gps');
+    }
+
+    /**
+     * Determine whether the user can bulk delete.
+     */
+    public function deleteAny(User $user): bool
+    {
+        return $user->can('delete_any_fleet::gps');
+    }
+
+    /**
+     * Determine whether the user can permanently delete.
+     */
+    public function forceDelete(User $user, FleetGps $fleetGps): bool
+    {
+        return $user->can('force_delete_fleet::gps');
+    }
+
+    /**
+     * Determine whether the user can permanently bulk delete.
+     */
+    public function forceDeleteAny(User $user): bool
+    {
+        return $user->can('force_delete_any_fleet::gps');
+    }
+
+    /**
+     * Determine whether the user can restore.
+     */
+    public function restore(User $user, FleetGps $fleetGps): bool
+    {
+        return $user->can('restore_fleet::gps');
+    }
+
+    /**
+     * Determine whether the user can bulk restore.
+     */
+    public function restoreAny(User $user): bool
+    {
+        return $user->can('restore_any_fleet::gps');
+    }
+
+    /**
+     * Determine whether the user can replicate.
+     */
+    public function replicate(User $user, FleetGps $fleetGps): bool
+    {
+        return $user->can('replicate_fleet::gps');
+    }
+
+    /**
+     * Determine whether the user can reorder.
+     */
+    public function reorder(User $user): bool
+    {
+        return $user->can('reorder_fleet::gps');
     }
 }
