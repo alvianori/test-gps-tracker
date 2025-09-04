@@ -27,6 +27,7 @@ class DatabaseSeeder extends Seeder
             FeatureSeeder::class,
             ServicePackageSeeder::class,
             TaskSeeder::class,
+            AreaSeeder::class,
         ]);
     }
 }
