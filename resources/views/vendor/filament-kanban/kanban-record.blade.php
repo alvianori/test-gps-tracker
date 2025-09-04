@@ -1,7 +1,17 @@
+@php
+    $status = strtolower(trim($record->status));
+
+    $bgColorClass = match ($status) {
+        'in progress' => 'bg-yellow-200',
+        'done' => 'bg-green-200',
+        default => 'bg-gray-200', // todo / lainnya
+    };
+@endphp
+
 <div
     id="{{ $record->getKey() }}"
-    wire:click="recordClicked('{{ $record->getKey() }}', {{ @json_encode($record) }})"
-    class="record bg-white dark:bg-gray-700 rounded-lg px-4 py-2 cursor-grab font-medium text-gray-600 dark:text-gray-200 flex justify-between items-center"
+    wire:click="recordClicked('{{ $record->getKey() }}', {{ json_encode($record) }})"
+    class="record {{ $bgColorClass }} rounded-lg px-4 py-2 cursor-grab font-medium text-gray-700 flex justify-between items-center"
 >
     <span>{{ $record->{static::$recordTitleAttribute} }}</span>
     <button
@@ -29,7 +39,8 @@ function confirmDelete(id) {
             cancelButton: 'swal2-cancel-btn'
         },
         didOpen: () => {
-            document.querySelector('.swal2-container').style.zIndex = 9999;
+            // pastikan swal selalu di atas modal/filament
+            document.querySelector('.swal2-container').style.zIndex = 99999;
         }
     }).then((result) => {
         if (result.isConfirmed) {
@@ -38,7 +49,6 @@ function confirmDelete(id) {
         }
     });
 }
-
 </script>
 
 <style>

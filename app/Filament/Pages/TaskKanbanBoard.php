@@ -4,12 +4,10 @@ namespace App\Filament\Pages;
 
 use Mokhosh\FilamentKanban\Pages\KanbanBoard;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Select;
 use Filament\Actions;
 use App\Models\Task;
 use App\Enums\TaskStatus;
 use Filament\Notifications\Notification;
-
 
 class TaskKanbanBoard extends KanbanBoard
 {
@@ -18,16 +16,47 @@ class TaskKanbanBoard extends KanbanBoard
     protected static string $statusEnum = TaskStatus::class;
     protected $listeners = ['deleteTask'];
 
-
+    /**
+     * Label kolom kanban
+     */
     protected function getStatusLabels(): array
     {
         return [
-            'todo' => 'To Do',
-            'in_progress' => 'In Progress',
-            'done' => 'Done',
+            TaskStatus::Todo->value => TaskStatus::Todo->label(),
+            TaskStatus::InProgress->value => TaskStatus::InProgress->label(),
+            TaskStatus::Done->value => TaskStatus::Done->label(),
         ];
     }
 
+    /**
+     * Warna card berdasarkan status
+     */
+    protected function getRecordClasses($record): array|string|null
+    {
+        return match ($record->status) {
+            TaskStatus::Todo->value => 'bg-gray-200 text-gray-800 dark:bg-gray-600 dark:text-gray-100',
+            TaskStatus::InProgress->value => 'bg-yellow-200 text-yellow-800 dark:bg-yellow-600 dark:text-yellow-100',
+            TaskStatus::Done->value => 'bg-green-200 text-green-800 dark:bg-green-600 dark:text-green-100',
+            default => 'bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200',
+        };
+    }
+
+    /**
+     * Warna header kolom berdasarkan status
+     */
+    protected function getStatusClasses(string $status): string
+    {
+        return match ($status) {
+            TaskStatus::Todo->value => 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200',
+            TaskStatus::InProgress->value => 'bg-yellow-100 text-yellow-800 dark:bg-yellow-700 dark:text-yellow-200',
+            TaskStatus::Done->value => 'bg-green-100 text-green-800 dark:bg-green-700 dark:text-green-200',
+            default => 'bg-slate-100 text-slate-800',
+        };
+    }
+
+    /**
+     * Action untuk membuat task baru
+     */
     protected function getHeaderActions(): array
     {
         return [
@@ -41,15 +70,18 @@ class TaskKanbanBoard extends KanbanBoard
                         ->required(),
                 ])
                 ->after(function ($record) {
-                Notification::make()
-                    ->title('Task Created!')
-                    ->body("Task '{$record->title}' berhasil dibuat.")
-                    ->success()
-                    ->send();
-            }),
+                    Notification::make()
+                        ->title('Task Created!')
+                        ->body("Task '{$record->title}' berhasil dibuat.")
+                        ->success()
+                        ->send();
+                }),
         ];
     }
 
+    /**
+     * Hapus task
+     */
     public function deleteTask($id)
     {
         Task::find($id)?->delete();
@@ -57,7 +89,9 @@ class TaskKanbanBoard extends KanbanBoard
         $this->dispatch('notify', type: 'success', message: 'Task berhasil dihapus');
     }
 
-    // Update data saat drag atau edit
+    /**
+     * Update data saat drag atau edit
+     */
     protected function editRecord(int|string $recordId, array $data, array $state): void
     {
         Task::findOrFail($recordId)->update([
@@ -65,7 +99,9 @@ class TaskKanbanBoard extends KanbanBoard
         ]);
     }
 
-    // Form edit modal
+    /**
+     * Schema form edit
+     */
     protected function getEditModalFormSchema(int|string|null $recordId): array
     {
         return [
@@ -75,97 +111,3 @@ class TaskKanbanBoard extends KanbanBoard
         ];
     }
 }
-
-//     <script>
-// function openNewTaskModal() {
-//     Swal.fire({
-//         title: 'Buat Tugas Baru',
-//         input: 'text',
-//         inputLabel: 'Judul Tugas',
-//         inputPlaceholder: 'Masukkan judul tugas',
-//         showCancelButton: true,
-//         confirmButtonText: 'Simpan',
-//         cancelButtonText: 'Batal',
-//         inputValidator: (value) => {
-//             if (!value) {
-//                 return 'Judul tidak boleh kosong!';
-//             }
-//         },
-//         preConfirm: (title) => {
-//             return fetch(`/kanban/task`, {
-//                 method: 'POST',
-//                 headers: {
-//                     'Content-Type': 'application/json',
-//                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-//                 },
-//                 body: JSON.stringify({ title: title, status: 'To Do' })
-//             })
-//             .then(response => {
-//                 if (!response.ok) throw new Error(response.statusText);
-//                 return response.json();
-//             })
-//             .catch(error => {
-//                 Swal.showValidationMessage(`Request gagal: ${error}`);
-//             });
-//         }
-//     }).then((result) => {
-//         if (result.isConfirmed) {
-//             Swal.fire('Berhasil!', 'Tugas baru ditambahkan.', 'success')
-//                 .then(() => window.location.reload());
-//         }
-//     });
-// }
-
-// </script>
-// <div
-//     id="{{ $record->getKey() }}"
-//     wire:click="recordClicked('{{ $record->getKey() }}', {{ @json_encode($record) }})"
-//     class="record bg-white dark:bg-gray-700 rounded-lg px-4 py-2 cursor-grab font-medium text-gray-600 dark:text-gray-200 flex justify-between items-center"
-//     @if($record->timestamps && now()->diffInSeconds($record->{$record::UPDATED_AT}, true) < 3)
-//         x-data
-//         x-init="
-//             $el.classList.add('animate-pulse-twice', 'bg-primary-100', 'dark:bg-primary-800')
-//             $el.classList.remove('bg-white', 'dark:bg-gray-700')
-//             setTimeout(() => {
-//                 $el.classList.remove('bg-primary-100', 'dark:bg-primary-800')
-//                 $el.classList.add('bg-white', 'dark:bg-gray-700')
-//             }, 3000)
-//         "
-//     @endif
-// >
-//     <span>{{ $record->{static::$recordTitleAttribute} }}</span>
-//     <button
-//         onclick="event.stopPropagation(); confirmDelete({{ $record->getKey() }})"
-//         class="text-red-500 hover:text-red-700"
-//     >
-//         🗑
-//     </button>
-// </div>
-
-// <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-// <script>
-// function confirmDelete(id) {
-//     Swal.fire({
-//         title: 'Yakin hapus?',
-//         text: "Data ini tidak bisa dikembalikan!",
-//         icon: 'warning',
-//         showCancelButton: true,
-//         confirmButtonColor: '#d33',
-//         cancelButtonColor: '#3085d6',
-//         confirmButtonText: 'Ya, hapus!',
-//         cancelButtonText: 'Batal'
-//     }).then((result) => {
-//         if (result.isConfirmed) {
-//             fetch(`/kanban/task/${id}`, {
-//                 method: 'DELETE',
-//                 headers: {
-//                     'X-CSRF-TOKEN': '{{ csrf_token() }}'
-//                 }
-//             }).then(() => {
-//                 Swal.fire('Berhasil!', 'Data telah dihapus.', 'success')
-//                     .then(() => window.location.reload());
-//             });
-//         }
-//     });
-// }
-// </script>
