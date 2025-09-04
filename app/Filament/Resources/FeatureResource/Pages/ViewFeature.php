@@ -4,6 +4,7 @@ namespace App\Filament\Resources\FeatureResource\Pages;
 
 use App\Filament\Resources\FeatureResource;
 use Filament\Resources\Pages\ViewRecord;
+use Filament\Actions;
 
 class ViewFeature extends ViewRecord
 {

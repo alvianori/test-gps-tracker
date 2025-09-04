@@ -10,6 +10,8 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Infolists\Infolist;
+use Filament\Infolists\Components;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
@@ -50,6 +52,11 @@ class AreaResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('rowIndex')
+                    ->label('No')
+                    ->rowIndex()
+                    ->sortable(false),
+
                 Tables\Columns\TextColumn::make('name')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('company.name')->label('Company'),
                 Tables\Columns\TextColumn::make('user.name')->label('User PIC'),
@@ -59,13 +66,69 @@ class AreaResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ViewAction::make()->slideOver(),
+                Tables\Actions\EditAction::make()->slideOver(),
                 Tables\Actions\DeleteAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+            ]);
+            // ->bulkActions([
+            //     Tables\Actions\BulkActionGroup::make([
+            //         Tables\Actions\DeleteBulkAction::make(),
+            //     ]),
+            // ]);
+    }
+
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+                Components\Section::make('Informasi Area')
+                    ->schema([
+                        Components\TextEntry::make('name')
+                            ->label('Nama Area')
+                            ->weight('bold')
+                            ->icon('heroicon-o-map'),
+
+                        Components\TextEntry::make('description')
+                            ->label('Deskripsi')
+                            ->placeholder('-'),
+                    ])
+                    ->columns(2),
+
+                Components\Section::make('Relasi')
+                    ->schema([
+                        Components\TextEntry::make('company.name')
+                            ->label('Perusahaan')
+                            ->badge()
+                            ->color('success'),
+
+                        Components\TextEntry::make('user.name')
+                            ->label('Penanggung Jawab')
+                            ->badge()
+                            ->color('info'),
+                    ])
+                    ->columns(2),
+
+                Components\Section::make('Informasi Audit')
+                    ->schema([
+                        Components\TextEntry::make('create_by')
+                            ->label('Dibuat Oleh'),
+
+                        Components\TextEntry::make('update_by')
+                            ->label('Diperbarui Oleh'),
+                    ])
+                    ->columns(2),
+
+                Components\Section::make('Informasi Waktu')
+                    ->schema([
+                        Components\TextEntry::make('created_at')
+                            ->label('Dibuat Pada')
+                            ->dateTime('d M Y, H:i'),
+
+                        Components\TextEntry::make('updated_at')
+                            ->label('Diperbarui Pada')
+                            ->dateTime('d M Y, H:i'),
+                    ])
+                    ->columns(2),
             ]);
     }
 
@@ -81,6 +144,7 @@ class AreaResource extends Resource
         return [
             'index' => Pages\ListAreas::route('/'),
             'create' => Pages\CreateArea::route('/create'),
+            'view' => Pages\ViewArea::route('/{record}'),
             'edit' => Pages\EditArea::route('/{record}/edit'),
         ];
     }

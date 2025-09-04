@@ -13,6 +13,8 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Infolists\Infolist;
+use Filament\Infolists\Components;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
@@ -49,7 +51,13 @@ class EventResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->columns([
+        ->columns([
+            TextColumn::make('rowIndex')
+                ->label('No')
+                ->rowIndex()
+                ->sortable(false),
+
+            
                 TextColumn::make('title')->label('Title'),
                 TextColumn::make('venue')->label('Venue'),
                 TextColumn::make('starts_at')->label('Starts At'),
@@ -61,12 +69,13 @@ class EventResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                Tables\Actions\DeleteAction::make(),
             ]);
+            // ->bulkActions([
+            //     Tables\Actions\BulkActionGroup::make([
+            //         Tables\Actions\DeleteBulkAction::make(),
+            //     ]),
+            // ]);
     }
 
     public static function getRelations(): array

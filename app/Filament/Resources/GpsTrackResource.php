@@ -55,6 +55,11 @@ class GpsTrackResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('rowIndex')
+                    ->label('No')
+                    ->rowIndex()
+                    ->sortable(false),
+    
                 Tables\Columns\TextColumn::make('gpsDevice.name')
                     ->label('Perangkat GPS')
                     ->searchable()

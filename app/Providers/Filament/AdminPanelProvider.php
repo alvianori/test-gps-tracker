@@ -14,6 +14,7 @@ use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use Filament\Widgets;
 use Saade\FilamentFullCalendar\FilamentFullCalendarPlugin;
+// use AymanAlhattami\FilamentSlimScrollbar\FilamentSlimScrollbarPlugin;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -32,6 +33,7 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->brandName('GPS Tracker')
             ->login(Login::class)
+            // ->viteTheme('resources/css/filament-custom.css')
             ->colors([
                 'primary' => '#2563eb', // biru
                 'success' => '#16a34a', // hijau
@@ -61,6 +63,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->plugins([
                 FilamentShieldPlugin::make(),
+                // FilamentSlimScrollbarPlugin::make(),
                 FilamentFullCalendarPlugin::make()
                     ->selectable(true)
                     ->editable()
