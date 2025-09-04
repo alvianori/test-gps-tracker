@@ -1,0 +1,19 @@
+/* Branding Title */
+.filament-sidebar-header {
+    font-weight: bold;
+    font-size: 18px;
+    color: #2563eb;
+}
+
+/* Menu Aktif */
+.filament-sidebar-item-active {
+    background-color: rgba(37, 99, 235, 0.15); /* Biru transparan */
+    border-radius: 8px;
+    color: #2563eb !important;
+    font-weight: bold;
+}
+
+/* Hover Menu */
+.filament-sidebar-item:hover {
+    background-color: rgba(37, 99, 235, 0.08);
+}

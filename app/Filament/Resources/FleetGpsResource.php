@@ -4,13 +4,13 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\FleetGpsResource\Pages;
 use App\Models\FleetGps;
-use App\Models\Fleet;
-use App\Models\GpsDevice;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Infolists\Infolist;
+use Filament\Infolists\Components;
 use Illuminate\Database\Eloquent\Builder;
 
 class FleetGpsResource extends Resource
@@ -18,13 +18,10 @@ class FleetGpsResource extends Resource
     protected static ?string $model = FleetGps::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-signal';
-    
     protected static ?string $navigationGroup = 'GPS Tracking';
-    
     protected static ?int $navigationSort = 1;
-    
+
     protected static ?string $modelLabel = 'Penugasan GPS';
-    
     protected static ?string $pluralModelLabel = 'Penugasan GPS';
 
     public static function form(Form $form): Form
@@ -41,7 +38,6 @@ class FleetGpsResource extends Resource
                                 if (!auth()->user()->hasRole('super_admin')) {
                                     $query->where('company_id', auth()->user()->company_id);
                                 }
-                                // Filter kendaraan yang belum memiliki penugasan GPS
                                 $assignedFleetIds = \App\Models\FleetGps::pluck('fleet_id')->toArray();
                                 $query->whereNotIn('id', $assignedFleetIds);
                                 return $query;
@@ -50,8 +46,10 @@ class FleetGpsResource extends Resource
                             ->searchable()
                             ->preload()
                             ->columnSpan(2)
+                            ->placeholder('Pilih kendaraan')
                             ->getOptionLabelFromRecordUsing(fn ($record) => "{$record->name} - {$record->plate_number}")
                             ->disabled(fn ($livewire) => $livewire instanceof Pages\EditFleetGps),
+
                         Forms\Components\Select::make('gps_device_id')
                             ->label('Perangkat GPS')
                             ->relationship('gpsDevice', 'name', function (Builder $query) {
@@ -64,15 +62,18 @@ class FleetGpsResource extends Resource
                             ->searchable()
                             ->preload()
                             ->columnSpan(2)
-                            ->helperText('Jika GPS sudah digunakan oleh kendaraan lain dan diaktifkan, kendaraan lain tersebut akan otomatis dinonaktifkan.'),
+                            ->placeholder('Pilih perangkat GPS')
+                            ->helperText('Jika GPS sudah digunakan oleh kendaraan lain, kendaraan tersebut akan otomatis dinonaktifkan.'),
+
                         Forms\Components\Toggle::make('active')
                             ->label('Status Aktif')
-                            ->required()
                             ->default(true),
+
                         Forms\Components\DateTimePicker::make('assigned_at')
                             ->label('Tanggal Mulai Penugasan')
-                            ->required()
-                            ->default(now()),
+                            ->default(now())
+                            ->required(),
+
                         Forms\Components\DateTimePicker::make('unassigned_at')
                             ->label('Tanggal Selesai Penugasan')
                             ->nullable(),
@@ -85,36 +86,55 @@ class FleetGpsResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('rowIndex')
+                    ->label('#')
+                    ->rowIndex(),
+
                 Tables\Columns\TextColumn::make('fleet.name')
                     ->label('Kendaraan')
                     ->searchable()
                     ->sortable()
+                    ->icon('heroicon-o-truck')
                     ->weight('bold'),
+
                 Tables\Columns\TextColumn::make('fleet.plate_number')
                     ->label('Nomor Plat')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->icon('heroicon-o-identification')
+                    ->copyable(),
+
                 Tables\Columns\TextColumn::make('gpsDevice.name')
                     ->label('Perangkat GPS')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->icon('heroicon-o-cpu-chip'),
+
                 Tables\Columns\TextColumn::make('gpsDevice.serial_number')
                     ->label('Nomor Seri')
                     ->searchable()
-                    ->sortable(),
-                Tables\Columns\IconColumn::make('active')
+                    ->sortable()
+                    ->icon('heroicon-o-hashtag')
+                    ->copyable(),
+
+                Tables\Columns\TextColumn::make('active')
                     ->label('Status')
-                    ->boolean()
-                    ->sortable(),
+                    ->badge()
+                    ->sortable()
+                    ->formatStateUsing(fn ($state) => $state ? 'Aktif' : 'Nonaktif')
+                    ->color(fn ($state) => $state ? 'success' : 'danger'),
+
                 Tables\Columns\TextColumn::make('assigned_at')
                     ->label('Tanggal Mulai')
                     ->dateTime('d M Y H:i')
                     ->sortable(),
+
                 Tables\Columns\TextColumn::make('unassigned_at')
                     ->label('Tanggal Selesai')
                     ->dateTime('d M Y H:i')
                     ->sortable()
-                    ->placeholder('-'),
+                    ->placeholder('-')
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('fleet_id')
@@ -127,6 +147,7 @@ class FleetGpsResource extends Resource
                     })
                     ->searchable()
                     ->preload(),
+
                 Tables\Filters\SelectFilter::make('gps_device_id')
                     ->label('Perangkat GPS')
                     ->relationship('gpsDevice', 'name', function (Builder $query) {
@@ -137,6 +158,7 @@ class FleetGpsResource extends Resource
                     })
                     ->searchable()
                     ->preload(),
+
                 Tables\Filters\SelectFilter::make('active')
                     ->label('Status')
                     ->options([
@@ -151,51 +173,91 @@ class FleetGpsResource extends Resource
                     ->color('success')
                     ->visible(fn (FleetGps $record) => !$record->active)
                     ->action(fn (FleetGps $record) => $record->activate()),
+
                 Tables\Actions\Action::make('deactivate')
                     ->label('Nonaktifkan')
                     ->icon('heroicon-o-x-circle')
                     ->color('danger')
                     ->visible(fn (FleetGps $record) => $record->active)
                     ->action(fn (FleetGps $record) => $record->deactivate()),
+
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkAction::make('activate')
-                    ->label('Aktifkan')
-                    ->icon('heroicon-o-check-circle')
-                    ->color('success')
-                    ->action(function ($records) {
-                        foreach ($records as $record) {
-                            $record->update(['active' => true]);
-                        }
-                    }),
-                Tables\Actions\BulkAction::make('deactivate')
-                    ->label('Nonaktifkan')
-                    ->icon('heroicon-o-x-circle')
-                    ->color('danger')
-                    ->action(function ($records) {
-                        foreach ($records as $record) {
-                            $record->update(['active' => false]);
-                        }
-                    }),
-                Tables\Actions\DeleteBulkAction::make(),
-            ])
+            // ->bulkActions([
+            //     Tables\Actions\BulkAction::make('activate')
+            //         ->label('Aktifkan')
+            //         ->icon('heroicon-o-check-circle')
+            //         ->color('success')
+            //         ->action(fn ($records) => $records->each->update(['active' => true])),
+
+            //     Tables\Actions\BulkAction::make('deactivate')
+            //         ->label('Nonaktifkan')
+            //         ->icon('heroicon-o-x-circle')
+            //         ->color('danger')
+            //         ->action(fn ($records) => $records->each->update(['active' => false])),
+
+            //     Tables\Actions\DeleteBulkAction::make(),
+            // ])
             ->defaultSort('created_at', 'desc');
     }
-    
+
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+                Components\Section::make('Detail Penugasan GPS')
+                    ->schema([
+                        Components\TextEntry::make('fleet.name')
+                            ->label('Kendaraan')
+                            ->icon('heroicon-o-truck')
+                            ->badge(),
+
+                        Components\TextEntry::make('fleet.plate_number')
+                            ->label('Nomor Plat')
+                            ->copyable(),
+
+                        Components\TextEntry::make('gpsDevice.name')
+                            ->label('Perangkat GPS')
+                            ->icon('heroicon-o-cpu-chip')
+                            ->badge()
+                            ->color('info'),
+
+                        Components\TextEntry::make('gpsDevice.serial_number')
+                            ->label('Nomor Seri')
+                            ->copyable(),
+
+                        Components\TextEntry::make('active')
+                            ->label('Status')
+                            ->badge()
+                            ->formatStateUsing(fn ($state) => $state ? 'Aktif' : 'Nonaktif')
+                            ->color(fn ($state) => $state ? 'success' : 'danger'),
+
+                        Components\TextEntry::make('assigned_at')
+                            ->label('Tanggal Mulai Penugasan')
+                            ->dateTime('d M Y H:i'),
+
+                        Components\TextEntry::make('unassigned_at')
+                            ->label('Tanggal Selesai Penugasan')
+                            ->dateTime('d M Y H:i')
+                            ->placeholder('-'),
+                    ])
+                    ->columns(2),
+            ]);
+    }
+
     public static function getRelations(): array
     {
-        return [
-            //
-        ];
+        return [];
     }
-    
+
     public static function getPages(): array
     {
         return [
             'index' => Pages\ListFleetGps::route('/'),
             'create' => Pages\CreateFleetGps::route('/create'),
+            'view' => Pages\ViewFleetGps::route('/{record}'), 
             'edit' => Pages\EditFleetGps::route('/{record}/edit'),
         ];
     }

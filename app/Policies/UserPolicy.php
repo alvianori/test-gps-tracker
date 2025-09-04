@@ -25,23 +25,11 @@ class UserPolicy
      * Determine whether the user can view the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\User  $model
      * @return bool
      */
-    public function view(User $user, User $model): bool
+    public function view(User $user): bool
     {
-        // Jika user memiliki permission view_user
-        if ($user->can('view_user')) {
-            // Super admin dapat melihat semua data
-            if ($user->hasRole('super_admin')) {
-                return true;
-            }
-            
-            // User lain hanya dapat melihat data dari company mereka sendiri
-            return $user->company_id === $model->company_id;
-        }
-        
-        return false;
+        return $user->can('view_user');
     }
 
     /**
@@ -59,46 +47,22 @@ class UserPolicy
      * Determine whether the user can update the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\User  $model
      * @return bool
      */
-    public function update(User $user, User $model): bool
+    public function update(User $user): bool
     {
-        // Jika user memiliki permission update_user
-        if ($user->can('update_user')) {
-            // Super admin dapat mengupdate semua data
-            if ($user->hasRole('super_admin')) {
-                return true;
-            }
-            
-            // User lain hanya dapat mengupdate data dari company mereka sendiri
-            return $user->company_id === $model->company_id;
-        }
-        
-        return false;
+        return $user->can('update_user');
     }
 
     /**
      * Determine whether the user can delete the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\User  $model
      * @return bool
      */
-    public function delete(User $user, User $model): bool
+    public function delete(User $user): bool
     {
-        // Jika user memiliki permission delete_user
-        if ($user->can('delete_user')) {
-            // Super admin dapat menghapus semua data
-            if ($user->hasRole('super_admin')) {
-                return true;
-            }
-            
-            // User lain hanya dapat menghapus data dari company mereka sendiri
-            return $user->company_id === $model->company_id;
-        }
-        
-        return false;
+        return $user->can('delete_user');
     }
 
     /**

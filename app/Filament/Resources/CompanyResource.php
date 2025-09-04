@@ -10,6 +10,8 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Infolists\Infolist;
+use Filament\Infolists\Components;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
@@ -28,49 +30,62 @@ class CompanyResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Section::make('Informasi Perusahaan')
-                    ->description('Masukkan informasi detail perusahaan')
+                    ->description('Masukkan informasi detail perusahaan dengan benar')
                     ->icon('heroicon-o-building-office-2')
                     ->schema([
-                        Forms\Components\TextInput::make('name')
-                            ->label('Nama Perusahaan')
-                            ->required()
-                            ->maxLength(255)
-                            ->placeholder('Masukkan nama perusahaan')
-                            ->live(onBlur: true)
-                            ->afterStateUpdated(function (string $state, callable $set) {
-                                $set('slug', str()->slug($state));
-                            })
-                            ->columnSpan(2),
-                        Forms\Components\TextInput::make('slug')
-                            ->label('Slug')
-                            ->required()
-                            ->maxLength(255)
-                            ->disabled()
-                            ->dehydrated()
-                            ->unique(ignoreRecord: true),
-                        Forms\Components\TextInput::make('email')
-                            ->label('Email')
-                            ->email()
-                            ->maxLength(255)
-                            ->placeholder('email@perusahaan.com'),
-                        Forms\Components\TextInput::make('phone')
-                            ->label('Nomor Telepon')
-                            ->tel()
-                            ->required()
-                            ->maxLength(20)
-                            ->placeholder('8xxxxxxxxxx')
-                            ->prefix('+62')
-                            ->regex('/^[0-9]{9,15}$/')
-                            ->validationAttribute('nomor telepon'),
+                        Forms\Components\Grid::make(2)->schema([
+                            Forms\Components\TextInput::make('name')
+                                ->label('Nama Perusahaan')
+                                ->required()
+                                ->maxLength(255)
+                                ->placeholder('Masukkan nama perusahaan')
+                                ->live(onBlur: true)
+                                ->afterStateUpdated(function (string $state, callable $set) {
+                                    $set('slug', str()->slug($state));
+                                })
+                                ->helperText('Nama perusahaan akan digunakan untuk slug otomatis.'),
+    
+                            Forms\Components\TextInput::make('slug')
+                                ->label('Slug')
+                                ->required()
+                                ->maxLength(255)
+                                ->disabled()
+                                ->dehydrated()
+                                ->unique(ignoreRecord: true),
+                        ]),
+    
+                        Forms\Components\Grid::make(2)->schema([
+                            Forms\Components\TextInput::make('email')
+                                ->label('Email')
+                                ->email()
+                                ->maxLength(255)
+                                ->placeholder('email@perusahaan.com')
+                                ->prefixIcon('heroicon-o-envelope'),
+    
+                            Forms\Components\TextInput::make('phone')
+                                ->label('Nomor Telepon')
+                                ->tel()
+                                ->required()
+                                ->maxLength(20)
+                                ->placeholder('8123456789')
+                                ->prefix('+62')
+                                ->regex('/^[0-9]{9,15}$/')
+                                ->helperText('Nomor telepon hanya angka, tanpa spasi atau simbol lain.')
+                                ->validationAttribute('nomor telepon')
+                                ->prefixIcon('heroicon-o-phone'),
+                        ]),
+    
                         Forms\Components\Select::make('business_type_id')
                             ->label('Jenis Bisnis')
                             ->relationship('businessType', 'name')
                             ->required()
                             ->searchable()
-                            ->preload(),
+                            ->preload()
+                            ->placeholder('Pilih jenis bisnis'),
                     ]),
+    
                 Forms\Components\Section::make('Informasi Alamat & NPWP')
-                    ->description('Masukkan informasi alamat dan NPWP perusahaan')
+                    ->description('Masukkan alamat lengkap dan NPWP perusahaan')
                     ->icon('heroicon-o-map-pin')
                     ->schema([
                         Forms\Components\Textarea::make('address')
@@ -80,11 +95,14 @@ class CompanyResource extends Resource
                             ->placeholder('Masukkan alamat lengkap perusahaan')
                             ->rows(3)
                             ->columnSpanFull(),
+    
                         Forms\Components\TextInput::make('npwp')
                             ->label('NPWP')
                             ->maxLength(20)
-                            ->placeholder('XX.XXX.XXX.X-XXX.XXX')
-                            ->mask('99.999.999.9-999.999'),
+                            ->placeholder('99.999.999.9-999.999')
+                            ->mask('99.999.999.9-999.999')
+                            ->prefixIcon('heroicon-o-document-text')
+                            ->helperText('Format: 99.999.999.9-999.999'),
                     ]),
             ]);
     }
@@ -93,67 +111,135 @@ class CompanyResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('rowIndex')
+                    ->label('No')
+                    ->rowIndex()
+                    ->sortable(false),
+    
                 Tables\Columns\TextColumn::make('name')
                     ->label('Nama Perusahaan')
                     ->searchable()
                     ->sortable()
                     ->icon('heroicon-o-building-office-2')
                     ->weight('bold'),
+    
                 Tables\Columns\TextColumn::make('businessType.name')
                     ->label('Jenis Bisnis')
                     ->badge()
                     ->color('success')
                     ->searchable(),
+    
                 Tables\Columns\TextColumn::make('email')
                     ->label('Email')
                     ->searchable()
                     ->icon('heroicon-o-envelope')
                     ->copyable(),
+    
                 Tables\Columns\TextColumn::make('phone')
                     ->label('Telepon')
                     ->searchable()
                     ->icon('heroicon-o-phone')
                     ->copyable(),
+    
                 Tables\Columns\TextColumn::make('address')
                     ->label('Alamat')
                     ->limit(30)
-                    ->tooltip(function (Tables\Columns\TextColumn $column): ?string {
-                        $state = $column->getState();
-                        if (strlen($state) <= 30) {
-                            return null;
-                        }
-                        return $state;
-                    })
+                    ->tooltip(fn ($record) => $record->address)
                     ->icon('heroicon-o-map-pin'),
+    
                 Tables\Columns\TextColumn::make('npwp')
                     ->label('NPWP')
                     ->searchable()
                     ->icon('heroicon-o-document-text')
                     ->copyable(),
+    
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Dibuat Pada')
                     ->dateTime('d M Y, H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+    
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label('Diperbarui Pada')
                     ->dateTime('d M Y, H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->filters([
-                //
-            ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                Tables\Actions\DeleteAction::make(),
+            ]);
+            // ->bulkActions([
+            //     Tables\Actions\BulkActionGroup::make([
+            //         Tables\Actions\DeleteBulkAction::make(),
+            //     ]),
+            // ]);
+    }
+
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+                Components\Section::make('Informasi Perusahaan')
+                    ->schema([
+                        Components\TextEntry::make('name')
+                            ->label('Nama Perusahaan')
+                            ->icon('heroicon-o-building-office-2')
+                            ->weight('bold'),
+
+                        Components\TextEntry::make('slug')
+                            ->label('Slug')
+                            ->copyable(),
+
+                        Components\TextEntry::make('businessType.name')
+                            ->label('Jenis Bisnis')
+                            ->badge()
+                            ->color('success'),
+                    ])
+                    ->columns(2),
+
+                Components\Section::make('Kontak')
+                    ->schema([
+                        Components\TextEntry::make('email')
+                            ->label('Email')
+                            ->icon('heroicon-o-envelope')
+                            ->copyable(),
+
+                        Components\TextEntry::make('phone')
+                            ->label('Nomor Telepon')
+                            ->icon('heroicon-o-phone')
+                            ->copyable(),
+                    ])
+                    ->columns(2),
+
+                Components\Section::make('Alamat & NPWP')
+                    ->schema([
+                        Components\TextEntry::make('address')
+                            ->label('Alamat')
+                            ->icon('heroicon-o-map-pin'),
+
+                        Components\TextEntry::make('npwp')
+                            ->label('NPWP')
+                            ->icon('heroicon-o-document-text')
+                            ->copyable(),
+                    ])
+                    ->columns(2),
+
+                Components\Section::make('Informasi Waktu')
+                    ->schema([
+                        Components\TextEntry::make('created_at')
+                            ->label('Dibuat Pada')
+                            ->dateTime('d M Y, H:i'),
+
+                        Components\TextEntry::make('updated_at')
+                            ->label('Diperbarui Pada')
+                            ->dateTime('d M Y, H:i'),
+                    ])
+                    ->columns(2),
             ]);
     }
+    
 
     public static function getRelations(): array
     {
