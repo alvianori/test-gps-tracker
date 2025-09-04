@@ -53,9 +53,10 @@ class AreaResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('rowIndex')
-                ->label('No')
-                ->rowIndex()
-                ->sortable(false),
+                    ->label('No')
+                    ->rowIndex()
+                    ->sortable(false),
+
                 Tables\Columns\TextColumn::make('name')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('company.name')->label('Company'),
                 Tables\Columns\TextColumn::make('user.name')->label('User PIC'),
